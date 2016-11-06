@@ -5,14 +5,27 @@ block content
     .ui.main.header.inverted
         span
             i.shield.yellow.icon
-        span Browse Submissions
+        if tag
+            span Browse items tagged as '#{tag}'
+        else
+            span Browse Submissions
     if submissions
         for item in submissions
             .ui.card
                 .content
-                    .header= item.title
+                    .header
+                        a(href='/browse/item/' + item._id)= item.title
                     .meta= 'submitted ' + locals.moment(item.timestamp).fromNow()
-                    .description.break-word= item.description
-        a.ui.right.labeled.icon.button(href='/browse/' + (page + 1))
-            i.right.chevron.icon
-            span Next
+                    .description.break-word!= item.description
+        if suggestion
+            a.ui.right.labeled.icon.button(href='/tags/suggestions/' + tag + '/' + (page + 1))
+                i.right.chevron.icon
+                span Next
+        else if tag
+            a.ui.right.labeled.icon.button(href='/tags/' + tag + '/' + (page + 1))
+                i.right.chevron.icon
+                span Next
+        else
+            a.ui.right.labeled.icon.button(href='/browse/' + (page + 1))
+                i.right.chevron.icon
+                span Next

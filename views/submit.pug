@@ -15,12 +15,12 @@ block content
             if complete
                 p We've received your submission!
                 .ui.buttons.right.floated
-                    a.ui.labeled.icon.button(href='/')
-                        i.check.circle.icon
+                    a.ui.left.labeled.icon.button(href='/')
+                        i.left.chevron.icon
                         span Return
                     .or
-                    a.ui.labeled.icon.positive.button(href='/submit')
-                        i.check.circle.icon
+                    a.ui.right.labeled.icon.positive.button(href='/submit')
+                        i.right.chevron.icon
                         span Submit Another
             else
                 form.ui.form(action="/submit", method="POST")
@@ -37,14 +37,15 @@ block content
                     .required.field
                         label Description
                         textarea(rows='4', name='description', placeholder='Place the information you\'d like conveyed to the user here', required="required")= content ? content.description : ''
-                    .required.field
+                    .field
                         label Live URL
-                        input(type='text', name='live_url', placeholder='Paste a link to view the issue at hand or learn more about it here (http://domain.com)', required="required",
-                        value=(content ? content.live_url : ''))
-                    .required.field
+                        input(type='text', name='live_url', placeholder='Paste a link to view the issue at hand or learn more about it here (http://domain.com)', value=(content ? content.live_url : ''))
+                    .field
                         label Disable URL
-                        input(type='text', name='disable_url', placeholder='Paste a link to learn more about disabling or resolving the issue at hand here (http://domain.com)', required="required",
-                        value=(content ? content.disable_url : ''))
+                        input(type='text', name='disable_url', placeholder='Paste a link to learn more about disabling or resolving the issue at hand here (http://domain.com)', value=(content ? content.disable_url : ''))
+                    .field
+                        label Tags
+                        input(type='text', name='tags', placeholder='Your issue\'s comma-separated tags', value=(content ? content.tags : ''))
                     .ui.buttons.right.floated
                         a.ui.negative.button(href='/') Cancel
                         .or

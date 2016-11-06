@@ -14,7 +14,7 @@ html
           .item
             i.material-icons security
           each item in locals.navigation
-            if (path == item.url || path.substring(item.url) > -1)
+            if (path == item.url || (item.url != '/' && path.search(item.url) > -1))
               a.active.item(href=item.url) #{item.title}
             else
               a.item(href=item.url) #{item.title}

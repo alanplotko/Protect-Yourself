@@ -1,0 +1,16 @@
+extends layout
+
+block content
+  .ui.container.centered.vert-center
+    .ui.huge.center.aligned.main.icon.inverted.header
+      i.facebook.f.icon.blue
+      .content= header
+      .main.sub.header= subtitle
+      form.ui.form(action=path, method='POST')
+        .two.fields.margin-top(style="padding-left: 22.5%;")
+          .field
+            input.align-input-padding(type='text', name='data', placeholder=label, required="required",
+            value=(content ? content.title : ''))
+          .field
+            .ui.buttons.left.floated
+              button.ui.large.inverted.button(type='Submit', class=color)= 'Check ' + service
