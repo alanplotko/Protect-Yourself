@@ -55,6 +55,10 @@ body {
     padding-bottom: 50px;
 }
 
+.margin-bottom {
+    margin-bottom: 50px!important;
+}
+
 .tags {
   list-style: none;
   margin: 0;

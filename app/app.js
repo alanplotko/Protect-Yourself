@@ -87,7 +87,7 @@ app.locals.navigation = [{
     url: '/submit'
 }, {
     title: 'Browse',
-    url: '/browse'
+    url: '/browse/all'
 }, {
     title: 'Random',
     url: '/random'
@@ -150,14 +150,14 @@ app.get('/checkup/:step', function(req, res) {
     }
 });
 
-app.get('/browse', function(req, res) {
-    return res.redirect('/browse/1');
+app.get('/browse/all', function(req, res) {
+    return res.redirect('/browse/all/1');
 });
 
-app.get('/browse/:page', function(req, res) {
+app.get('/browse/all/:page', function(req, res) {
     req.sanitizeParams();
     req.checkParams('page', 'Invalid page').isInt();
-    if (req.validationErrors()) return res.redirect('/browse/1');
+    if (req.validationErrors()) return res.redirect('/browse/all/1');
     var page = parseInt(req.params.page);
     var results = SuggestionItem.find().sort({'timestamp': -1}).limit(3).skip((page - 1) * 3);
     results.exec(function(err, result) {
@@ -169,16 +169,17 @@ app.get('/browse/:page', function(req, res) {
             return res.render('browse', {
                 path: res.locals.path,
                 submissions: result,
-                page: page
+                page: page,
+                suggestion: true
             });
         }
     });
 });
 
-app.get('/random', function(req, res) {
-    return SuggestionItem.random(function(err, result) {
+app.get('/browse/suggestion/:id', function(req, res) {
+    return SuggestionItem.findOne({ _id: req.params.id }, function(err, result) {
         if (err || !result) {
-            return res.redirect('/browse/1');
+            return res.redirect('/browse/all/1');
         } else {
             return res.render('checkup', {
                 path: res.locals.path,
@@ -192,9 +193,24 @@ app.get('/random', function(req, res) {
 });
 
 app.get('/browse/item/:id', function(req, res) {
-    return SuggestionItem.findOne({ _id: req.params.id }, function(err, result) {
+    return CheckUpItem.findOne({ _id: req.params.id }, function(err, result) {
         if (err || !result) {
-            return res.redirect('/browse/1');
+            return res.redirect('/browse/all/1');
+        } else {
+            return res.render('checkup', {
+                path: res.locals.path,
+                current: {
+                    step: result
+                }
+            });
+        }
+    });
+});
+
+app.get('/random', function(req, res) {
+    return SuggestionItem.random(function(err, result) {
+        if (err || !result) {
+            return res.redirect('/browse/all/1');
         } else {
             return res.render('checkup', {
                 path: res.locals.path,
@@ -234,7 +250,7 @@ app.post('/submit', function(req, res) {
     }
 
     var tags = req.param('tags').split(',');
-    for (var i = 0; i < tags.length; i++) tags[i] = tags[i].trim();
+    for (var i = 0; i < tags.length; i++) tags[i] = tags[i].trim().toLowerCase();
 
     var submission = new SuggestionItem({
         title: req.param('title'),
@@ -270,7 +286,7 @@ app.get('/tags/suggestions/:tag/:page', function(req, res) {
     req.checkParams('page', 'Invalid page').isInt();
     var page = parseInt(req.params.page);
     if (req.validationErrors()) return res.redirect('/');
-    var results = SuggestionItem.find({ 'tags': { "$in" : [req.params.tag, req.params.tag.toLowerCase()]} }).sort({'step': 1}).limit(3).skip((page - 1) * 3);
+    var results = SuggestionItem.find({ 'tags': { "$in": [req.params.tag] } }).sort({'step': 1}).limit(3).skip((page - 1) * 3);
     results.exec(function(err, result) {
         if (err) {
             return res.redirect('/');
@@ -298,7 +314,7 @@ app.get('/tags/:tag/:page', function(req, res) {
     req.checkParams('page', 'Invalid page').isInt();
     var page = parseInt(req.params.page);
     if (req.validationErrors()) return res.redirect('/');
-    var results = CheckUpItem.find({ 'tags': { "$in" : [req.params.tag, req.params.tag.toLowerCase()]} }).sort({'step': 1}).limit(3).skip((page - 1) * 3);
+    var results = CheckUpItem.find({ 'tags': { "$in": [req.params.tag] } }).sort({'step': 1}).limit(3).skip((page - 1) * 3);
     results.exec(function(err, result) {
         if (err) {
             return res.redirect('/');
