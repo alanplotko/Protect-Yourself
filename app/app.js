@@ -34,7 +34,8 @@ var suggestionSchema = new Schema({
     disable: String,
     timestamp: { type: Date, default: Date.now },
     upvotes: { type: Number, default: 0 },
-    tags: [String]
+    tags: [String],
+    author: String
 });
 suggestionSchema.statics.random = function(callback) {
     this.count(function(err, count) {
@@ -254,6 +255,7 @@ app.post('/submit', function(req, res) {
 
     var submission = new SuggestionItem({
         title: req.param('title'),
+        author: req.param('name'),
         description: req.param('description'),
         view: req.param('live_url'),
         disable: req.param('disable_url'),

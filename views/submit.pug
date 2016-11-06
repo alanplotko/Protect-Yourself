@@ -30,6 +30,9 @@ block content
                             ul
                                 for error in errors
                                     li= error.msg
+                    .field
+                        label Name
+                        input(type='text', name='name', placeholder='The name (e.g. username, alias) to attribute this submission to', value=(content ? content.author : ''))
                     .required.field
                         label Title
                         input(type='text', name='title', placeholder='The text that best describes the topic of your checkup item', required="required",

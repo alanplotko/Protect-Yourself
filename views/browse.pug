@@ -18,9 +18,12 @@ block content
                             a(href='/browse/suggestion/' + item._id)= item.title
                         else
                             a(href='/browse/item/' + item._id)= item.title
-                    .meta= 'submitted ' + locals.moment(item.timestamp).fromNow()
+                    if item.author
+                        .meta!= 'submitted by <strong><em>' + item.author + '</em></strong> ' + locals.moment(item.timestamp).fromNow()
+                    else
+                        .meta!= 'submitted by <strong><em>someone</em></strong> ' + locals.moment(item.timestamp).fromNow()
                     .description.break-word!= item.description
-        if suggestion
+        if suggestion && tag
             a.ui.right.labeled.icon.button.margin-bottom(href='/tags/suggestions/' + tag + '/' + (page + 1))
                 i.right.chevron.icon
                 span Next
@@ -29,6 +32,6 @@ block content
                 i.right.chevron.icon
                 span Next
         else
-            a.ui.right.labeled.icon.button.margin-bottom(href='/browse/' + (page + 1))
+            a.ui.right.labeled.icon.button.margin-bottom(href='/browse/all/' + (page + 1))
                 i.right.chevron.icon
                 span Next
