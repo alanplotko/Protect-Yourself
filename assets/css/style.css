@@ -25,3 +25,14 @@ body {
 .padding-bottom {
     padding-bottom: 50px!important;
 }
+
+.break-word {
+    word-wrap: break-word;
+}
+
+.ui.card {
+    width: 100%;
+    margin-bottom: 20px;
+    height: 100px;
+    overflow-y: scroll;
+}

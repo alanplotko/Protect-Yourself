@@ -5,7 +5,8 @@ var marked = require('marked');
 var util = require('util');
 var bodyParser = require('body-parser');
 var expressValidator = require('express-validator');
-
+var moment = require('moment');
+moment().format();
 var app = express();
 
 const path = require('path');
@@ -29,7 +30,9 @@ var suggestionSchema = new Schema({
     title: String,
     description: String,
     view: String,
-    disable: String
+    disable: String,
+    timestamp: { type: Date, default: Date.now },
+    upvotes: { type: Number, default: 0 }
 });
 var CheckUpItem = mongoose.model('CheckUpItem', checkUpSchema, 'security');
 var SuggestionItem = mongoose.model('SuggestionItem', suggestionSchema, 'suggestions');
@@ -44,6 +47,7 @@ app.use(favicon(dir + '/public/favicon.ico'));
 app.use('/public', express.static(dir + '/public/'));
 app.use('/semantic', express.static(dir + '/node_modules/semantic-ui/dist/'));
 app.use('/jquery', express.static(dir + '/node_modules/jquery/dist/'));
+app.use('/moment', express.static(dir + '/node_modules/moment/min/'));
 app.use('/assets', express.static(dir + '/assets/'));
 app.use(function(req, res, next) {
     var pathStr = req.path;
@@ -60,6 +64,7 @@ app.use(expressValidator());
 
 // App locals configuration
 app.locals.title = "Protect Yourself";
+app.locals.moment = moment;
 app.locals.navigation = [{
     title: 'Home',
     url: '/'
@@ -113,12 +118,6 @@ app.get('/checkup/:step', function(req, res) {
     }
 });
 
-app.get('/submit', function(req, res) {
-    res.render('submit', {
-        path: res.locals.path
-    });
-});
-
 app.get('/browse', function(req, res) {
     return res.redirect('/browse/1');
 });
@@ -128,18 +127,25 @@ app.get('/browse/:page', function(req, res) {
     req.checkParams('page', 'Invalid page').isInt();
     if (req.validationErrors()) return res.redirect('/browse/1')
     var page = parseInt(req.params.page);
-    var results = SuggestionItem.find(10).skip((page - 1) * 10);
+    var results = SuggestionItem.find().sort({'timestamp': -1}).limit(3).skip((page - 1) * 3);
     results.exec(function(err, result) {
         if (err) {
             return res.redirect('/');
         } else if (result.length == 0) {
-            return res.redirect('/browse/1');
+            return res.redirect('/');
         } else {
             return res.render('browse', {
                 path: res.locals.path,
-                submissions: result
+                submissions: result,
+                page: page
             });
         }
+    });
+});
+
+app.get('/submit', function(req, res) {
+    res.render('submit', {
+        path: res.locals.path
     });
 });
 
@@ -166,8 +172,18 @@ app.post('/submit', function(req, res) {
     });
 
     submission.save(function(err) {
-        if (err) res.send(err);
-        res.json({ message: 'Submission created!' });
+        if (err) {
+            return res.render('submit', {
+                path: res.locals.path,
+                content: req.body,
+                errors: err
+            });
+        } else {
+            return res.render('submit', {
+                path: res.locals.path,
+                complete: true
+            });
+        }
     });
 });
 

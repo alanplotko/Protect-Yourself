@@ -11,5 +11,8 @@ block content
             .ui.card
                 .content
                     .header= item.title
-                    .meta Timestamp Here
-                    .description= item.description
+                    .meta= 'submitted ' + locals.moment(item.timestamp).fromNow()
+                    .description.break-word= item.description
+        a.ui.right.labeled.icon.button(href='/browse/' + (page + 1))
+            i.right.chevron.icon
+            span Next
