@@ -1,0 +1,36 @@
+{
+  "name": "hackae-project",
+  "version": "0.1.0-alpha",
+  "description": "Application to encourage users to protect their data.",
+  "main": "index.js",
+  "dependencies": {
+    "bluebird": "^3.4.6",
+    "body-parser": "^1.15.2",
+    "express": "^4.14.0",
+    "express-validator": "^2.21.0",
+    "jquery": "^3.1.1",
+    "marked": "^0.3.6",
+    "mongoose": "^4.6.6",
+    "pug": "^2.0.0-beta6",
+    "semantic-ui": "^2.2.6",
+    "serve-favicon": "^2.3.0",
+    "util": "^0.10.3"
+  },
+  "devDependencies": {
+    "nodemon": "^1.11.0"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon app/app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/alanplotko/hackAE.git"
+  },
+  "author": "Alan Plotko",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/alanplotko/hackAE/issues"
+  },
+  "homepage": "https://github.com/alanplotko/hackAE#readme"
+}

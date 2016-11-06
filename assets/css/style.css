@@ -1,0 +1,27 @@
+body {
+    background-color: #232728;
+}
+
+.splash {
+    padding: 20px;
+}
+
+.vert-center {
+    margin-top: 75px;
+}
+
+.vert-center.half {
+    margin-top: 35px;
+}
+
+.main.header {
+    font-size: 48px!important;
+}
+
+.main.sub.header {
+    font-size: 24px!important;
+}
+
+.padding-bottom {
+    padding-bottom: 50px!important;
+}

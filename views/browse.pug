@@ -1,0 +1,15 @@
+extends layout
+
+block content
+  .ui.container.centered.vert-center.half
+    .ui.main.header.inverted
+        span
+            i.shield.yellow.icon
+        span Browse Submissions
+    if submissions
+        for item in submissions
+            .ui.card
+                .content
+                    .header= item.title
+                    .meta Timestamp Here
+                    .description= item.description

@@ -1,0 +1,36 @@
+extends layout
+
+block content
+  .ui.container.centered.vert-center.half
+    .ui.main.header.inverted
+        span
+            i.shield.yellow.icon
+        span Submit a Checkup Item
+    .ui.raised.segments
+        .ui.huge.segment.padding-bottom
+            form.ui.form(action="/submit", method="POST")
+                if errors
+                    .ui.error.message.visible
+                        .header Oops! There was an error!
+                        ul
+                            for error in errors
+                                li= error.msg
+                .required.field
+                    label Title
+                    input(type='text', name='title', placeholder='The text that best describes the topic of your checkup item', required="required",
+                    value=(content ? content.title : ''))
+                .required.field
+                    label Description
+                    textarea(rows='4', name='description', placeholder='Place the information you\'d like conveyed to the user here', required="required")= content ? content.description : ''
+                .required.field
+                    label Live URL
+                    input(type='text', name='live_url', placeholder='Paste a link to view the issue at hand or learn more about it here (http://domain.com)', required="required",
+                    value=(content ? content.live_url : ''))
+                .required.field
+                    label Disable URL
+                    input(type='text', name='disable_url', placeholder='Paste a link to learn more about disabling or resolving the issue at hand here (http://domain.com)', required="required",
+                    value=(content ? content.disable_url : ''))
+                .ui.buttons.right.floated
+                    a.ui.negative.button(href='/') Cancel
+                    .or
+                    button.ui.positive.button(type='Submit') Submit

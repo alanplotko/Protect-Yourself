@@ -1,0 +1,32 @@
+extends layout
+
+block content
+  .ui.container.centered.vert-center.half
+    .ui.main.header.inverted
+        span
+            i.question.circle.icon
+        span= current.step.title
+    .ui.raised.segments
+        .ui.huge.segment
+            p!= current.step.description
+        .ui.clearing.segment
+            if (path != '/checkup')
+                .ui.buttons.left.floated
+                    a.ui.blue.button(href=current.step.view, target='_blank') Check it out
+                    .or
+                    a.ui.negative.button(href=current.step.disable, target='_blank') Disable
+            .ui.buttons.right.floated
+                if (path != '/checkup')
+                    if (current.idx - 1 == 0)
+                        a.ui.labeled.icon.button(href='/checkup/')
+                            i.left.chevron.icon
+                            span Back
+                        .or
+                    else
+                        a.ui.labeled.icon.button(href='/checkup/' + (current.idx - 1))
+                            i.left.chevron.icon
+                            span Back
+                        .or
+                a.ui.right.labeled.icon.button(href='/checkup/' + (current.idx + 1))
+                    i.right.chevron.icon
+                    span Next

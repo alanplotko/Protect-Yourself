@@ -1,0 +1,22 @@
+extends layout
+
+block content
+  .ui.container.centered.vert-center.half
+    .ui.main.header.inverted
+        span
+            i.check.circle.green.icon
+        span You're done!
+    .ui.raised.segments
+        .ui.huge.segment
+            p The checkup may be done, but you're only getting started! You need to keep an eye out for what personal information is asked of you at any time.
+            p Being cautious with your personal information can prevent situations where it cannot be entirely taken off the web.
+            p: em Feel like something's missing? You can contribute your own checkup item or view the items created by others!
+        .ui.clearing.segment
+            .ui.buttons.left.floated
+                a.ui.blue.button(href='/submit') Submit Checkup Item
+                .or
+                a.ui.green.button(href='/browse') Browse Submissions
+            .ui.buttons.right.floated
+                a.ui.labeled.icon.button(href='/')
+                    i.check.circle.icon
+                    span Return
