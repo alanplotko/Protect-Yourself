@@ -1,8 +1,10 @@
 ![Protect Yourself Banner](https://raw.githubusercontent.com/alanplotko/Protect-Yourself/master/docs/banner.png)
 
-## About
+## Inspiration
 
 Online services and companies have lots of information about us to help personalize and better our experience. However, sometimes the value of the information outweighs the benefits. There are also some that follow an opt-out policy, with very little effort in spreading the awareness of what it means to be opted in by default.
+
+## About
 
 Protect Yourself is a web application that educates users in what to watch out for before divulging personal information. The application provides tips, specific cases, and an online checkup process for how to handle your personal information. It also has a submission system to facilitate community-generated content. As such, more recent exploits, risks, and tips can easily populate into the application. Users can go through the process, submit their own tips and cases, and browse submissions from others.
 
