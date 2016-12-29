@@ -1,4 +1,4 @@
-![Protect Yourself Banner](https://raw.githubusercontent.com/alanplotko/Protect-Yourself/master/docs/banner.png)
+![Protect Yourself Banner](https://raw.githubusercontent.com/alanplotko/Protect-Yourself/master/docs/banner2.png)
 
 ## About
 
