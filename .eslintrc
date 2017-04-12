@@ -1,0 +1,10 @@
+{
+    "parserOptions": {
+        "ecmaVersion": 6
+    },
+    "extends": "google",
+    "rules": {
+        "comma-dangle": ["error", "never"],
+	"max-len": [2, 80, 4, {"ignoreRegExpLiterals": true}]
+    }
+}

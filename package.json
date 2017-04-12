@@ -1,28 +1,31 @@
 {
-  "name": "hackae-project",
-  "version": "0.1.0-alpha",
-  "description": "Application to encourage users to protect their data.",
-  "main": "index.js",
+  "name": "protect-yourself",
+  "version": "0.2.0-alpha",
+  "description": "Protect Yourself is a web application that educates users in what to watch out for before divulging personal information.",
+  "main": "app/app.js",
   "dependencies": {
     "bluebird": "^3.4.6",
     "body-parser": "^1.15.2",
     "express": "^4.14.0",
     "express-validator": "^2.21.0",
     "jquery": "^3.1.1",
-    "marked": "^0.3.6",
     "moment": "^2.15.2",
     "mongoose": "^4.6.6",
     "pug": "^2.0.0-beta6",
     "semantic-ui": "^2.2.6",
-    "serve-favicon": "^2.3.0",
-    "util": "^0.10.3"
+    "serve-favicon": "^2.3.0"
   },
   "devDependencies": {
+    "eslint": "^3.19.0",
+    "eslint-config-google": "^0.7.1",
+    "mocha": "^3.2.0",
+    "mocha-csslint": "^1.0.0",
+    "mocha-eslint": "^3.0.1",
     "nodemon": "^1.11.0"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon app/app.js"
+    "test": "./node_modules/.bin/mocha test",
+    "start": "./node_modules/.bin/nodemon app/app.js"
   },
   "repository": {
     "type": "git",
