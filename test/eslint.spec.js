@@ -10,6 +10,7 @@ colors['light'] = '1;36';
 colors['diff gutter'] = '1;36';
 
 require('mocha-eslint')([
+  'common',
   'config',
   'models',
   'routes',
