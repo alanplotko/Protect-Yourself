@@ -21,8 +21,8 @@ module.exports = function(app) {
     });
 
     app.post('/checkup/facebook', function(req, res) {
-        return res.redirect(singleLineString
-            `https://www.facebook.com/${req.body.data}?viewas=100000686899395`);
+        return res.redirect('https://www.facebook.com/' + req.body.data
+            + '?viewas=100000686899395');
     });
 
     app.get('/checkup', function(req, res) {

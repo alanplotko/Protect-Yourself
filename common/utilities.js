@@ -1,6 +1,4 @@
-module.exports.singleLineString = function(strings) {
-    let values = Array.prototype.slice.call(arguments, 1);
-
+module.exports.singleLineString = function(strings, ...values) {
     // Interweave the strings with the substitution vars first.
     let output = '';
     for (let i = 0; i < values.length; i++) {
@@ -12,7 +10,7 @@ module.exports.singleLineString = function(strings) {
     let lines = output.split(/(?:\r\n|\n|\r)/);
 
     // Rip out the leading whitespace.
-    return lines.map(function(line) {
+    return lines.map((line) => {
         return line.replace(/^\s+/gm, '');
     }).join(' ').trim();
 };
