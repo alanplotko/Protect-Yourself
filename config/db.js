@@ -1,5 +1,6 @@
+const connection = require('./settings').mongodb;
 const mongoose = require('mongoose');
-mongoose.connect('mongodb://localhost:27017/hackae');
+mongoose.connect(connection.URL);
 mongoose.Promise = require('bluebird');
 
 module.exports.mongoose = mongoose;

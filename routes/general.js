@@ -1,6 +1,25 @@
 const CheckupItem = require('../models/checkup_item').CheckupItem;
 const SuggestionItem = require('../models/suggestion_item').SuggestionItem;
 
+const singleLineString = function(strings) {
+    let values = Array.prototype.slice.call(arguments, 1);
+
+    // Interweave the strings with the substitution vars first.
+    let output = '';
+    for (let i = 0; i < values.length; i++) {
+        output += strings[i] + values[i];
+    }
+    output += strings[values.length];
+
+    // Split on newlines.
+    let lines = output.split(/(?:\r\n|\n|\r)/);
+
+    // Rip out the leading whitespace.
+    return lines.map(function(line) {
+        return line.replace(/^\s+/gm, '');
+    }).join(' ').trim();
+};
+
 module.exports = function(app) {
     app.get('/', function(req, res) {
         res.render('index', {
@@ -20,8 +39,8 @@ module.exports = function(app) {
     });
 
     app.post('/checkup/facebook', function(req, res) {
-        return res.redirect(`https://www.facebook.com/${req.body.data}
-            ?viewas=100000686899395`);
+        return res.redirect(singleLineString
+            `https://www.facebook.com/${req.body.data}?viewas=100000686899395`);
     });
 
     app.get('/checkup', function(req, res) {
@@ -30,12 +49,12 @@ module.exports = function(app) {
             current: {
                 step: {
                     title: 'Online Check Up',
-                    description: `We'll walk you through some of the things
-                        to watch out for when giving out your personal
-                        information.<br /><br />Not many people know of the
-                        extent of the information companies or online services
-                        collect. We'll show you some examples and point you in
-                        the right direction if you choose to opt out.`
+                    description: singleLineString `We'll walk you through some
+                        of the things to watch out for when giving out your
+                        personal information.<br /><br />Not many people know
+                        of the extent of the information companies or online
+                        services collect. We'll show you some examples and point
+                        you in the right direction if you choose to opt out.`
                 },
                 idx: 0
             }
