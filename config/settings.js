@@ -1,3 +1,3 @@
 module.exports.mongodb = {
-    'URL': 'mongodb://localhost:27017/hackae'
+    'URL': process.env.PY_MONGO_URL
 };
