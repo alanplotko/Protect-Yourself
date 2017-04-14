@@ -5,22 +5,22 @@ html
     meta(name='viewport', content='width=device-width, initial-scale=1.0, maximum-scale=1.0')
     link(rel="stylesheet", href="/semantic/semantic.min.css")
     link(rel="stylesheet", href="https://fonts.googleapis.com/icon?family=Material+Icons")
-    link(rel="stylesheet", href="/assets/css/style.css")
+    link(rel="stylesheet", href="/assets/css/main.css")
+    block styles
     title= locals.title
   body
-    .splash
-      .ui.container
-        .ui.huge.inverted.secondary.menu
-          .item
-            i.material-icons security
-          each item in locals.navigation
-            if (path == item.url || (item.url != '/' && path.search(item.url) > -1))
-              a.active.item(href=item.url) #{item.title}
-            else
-              a.item(href=item.url) #{item.title}
+    .ui.huge.inverted.secondary.attached.stackable.menu.navigation
+      .item
+        i.material-icons security
+      each item in locals.navigation
+        if (path == item.url || (item.url != '/' && path.search(item.url) > -1))
+          a.active.item(href=item.url) #{item.title}
+        else
+          a.item(href=item.url) #{item.title}
 
     block content
 
     script(src="/jquery/jquery.min.js")
     script(src="/semantic/semantic.min.js")
     script(src="/moment/moment.min.js")
+    block scripts
