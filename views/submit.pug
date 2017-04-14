@@ -1,55 +1,56 @@
 extends layout
 
 block content
-  .ui.container.centered.vert-center.half
-    .ui.main.header.inverted
-        span
-            if complete
-                i.check.circle.green.icon
-                span Submitted!
-            else
-                i.add.circle.yellow.icon
-                span Submit a Checkup Item
-    .ui.raised.segments
-        .ui.huge.segment.padding-bottom
-            if complete
-                p We've received your submission!
-                .ui.buttons.right.floated
-                    a.ui.left.labeled.icon.button(href='/')
-                        i.left.chevron.icon
-                        span Return
-                    .or
-                    a.ui.right.labeled.icon.positive.button(href='/submit')
-                        i.right.chevron.icon
-                        span Submit Another
-            else
-                form.ui.form(action="/submit", method="POST")
-                    if errors
-                        .ui.error.message.visible
-                            .header Oops! There was an error!
-                            ul
-                                for error in errors
-                                    li= error.msg
-                    .field
-                        label Name
-                        input(type='text', name='name', placeholder='The name (e.g. username, alias) to attribute this submission to', value=(content ? content.author : ''))
-                    .required.field
-                        label Title
-                        input(type='text', name='title', placeholder='The text that best describes the topic of your checkup item', required="required",
-                        value=(content ? content.title : ''))
-                    .required.field
-                        label Description
-                        textarea(rows='4', name='description', placeholder='Place the information you\'d like conveyed to the user here', required="required")= content ? content.description : ''
-                    .field
-                        label Live URL
-                        input(type='text', name='live_url', placeholder='Paste a link to view the issue at hand or learn more about it here (http://domain.com)', value=(content ? content.live_url : ''))
-                    .field
-                        label Disable URL
-                        input(type='text', name='disable_url', placeholder='Paste a link to learn more about disabling or resolving the issue at hand here (http://domain.com)', value=(content ? content.disable_url : ''))
-                    .field
-                        label Tags
-                        input(type='text', name='tags', placeholder='Your issue\'s comma-separated tags', value=(content ? content.tags : ''))
-                    .ui.buttons.right.floated
-                        a.ui.negative.button(href='/') Cancel
-                        .or
-                        button.ui.positive.button(type='Submit') Submit
+  .ui.container
+    .ui.large.main.header.inverted
+      span
+        if complete
+          i.check.circle.green.icon
+          span Submitted!
+        else
+          i.add.circle.yellow.icon
+          span Submit a Checkup Item
+    .ui.huge.clearing.segment.padding-bottom
+        if complete
+          p We've received your submission!
+          .ui.buttons.right.floated
+            a.ui.left.labeled.icon.button(href='/')
+              i.left.chevron.icon
+              span Return
+            .or
+            a.ui.right.labeled.icon.positive.button(href='/submit')
+              i.right.chevron.icon
+              span Submit Another
+        else
+          form.ui.form(action="/submit", method="POST")
+            if errors
+              .ui.error.message.visible
+                .header Oops! There was an error!
+                ul
+                  for error in errors
+                    li= error.msg
+            .two.fields
+              .field
+                label Name
+                input(type='text', name='name', placeholder='The name (e.g. username, alias) to attribute this submission to', value=(content ? content.author : ''))
+              .required.field
+                label Title
+                input(type='text', name='title', placeholder='The text that best describes the topic of your checkup item', required="required",
+                  value=(content ? content.title : ''))
+            .required.field
+              label Description
+              textarea(rows='4', name='description', placeholder='Place the information you\'d like conveyed to the user here', required="required")= content ? content.description : ''
+            .two.fields
+              .field
+                label Live URL
+                input(type='text', name='live_url', placeholder='Paste a link to learn more about the topic here (http://domain.com)', value=(content ? content.live_url : ''))
+              .field
+                label Disable URL
+                input(type='text', name='disable_url', placeholder='Paste a link to learn more about disabling the issue here (http://domain.com)', value=(content ? content.disable_url : ''))
+            .field
+              label Tags
+              input(type='text', name='tags', placeholder='Your issue\'s comma-separated tags', value=(content ? content.tags : ''))
+            .ui.buttons.right.floated
+              a.ui.negative.button(href='/') Cancel
+              .or
+              button.ui.positive.button(type='Submit') Submit

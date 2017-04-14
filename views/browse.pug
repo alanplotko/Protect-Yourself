@@ -1,37 +1,40 @@
 extends layout
 
+block styles
+    link(rel="stylesheet", href="/assets/css/card.css")
+
 block content
-  .ui.container.centered.vert-center.half
-    .ui.main.header.inverted
-        span
-            i.shield.yellow.icon
-        if tag
-            span Browse items tagged as '#{tag}'
-        else
-            span Browse Submissions
+  .ui.container(style="margin-bottom: 50px;")
+    .ui.large.main.header.inverted
+      span
+        i.shield.yellow.icon
+      if tag
+        span Browse items tagged as '#{tag}'
+      else
+        span Browse Submissions
     if submissions
-        for item in submissions
-            .ui.card
-                .content
-                    .header
-                        if suggestion
-                            a(href='/browse/suggestion/' + item._id)= item.title
-                        else
-                            a(href='/browse/item/' + item._id)= item.title
-                    if item.author
-                        .meta!= 'submitted by <strong><em>' + item.author + '</em></strong> ' + locals.moment(item.timestamp).fromNow()
-                    else
-                        .meta!= 'submitted by <strong><em>someone</em></strong> ' + locals.moment(item.timestamp).fromNow()
-                    .description.break-word!= item.description
-        if suggestion && tag
-            a.ui.right.labeled.icon.button.margin-bottom(href='/tags/suggestions/' + tag + '/' + (page + 1))
-                i.right.chevron.icon
-                span Next
-        else if tag
-            a.ui.right.labeled.icon.button.margin-bottom(href='/tags/' + tag + '/' + (page + 1))
-                i.right.chevron.icon
-                span Next
-        else
-            a.ui.right.labeled.icon.button.margin-bottom(href='/browse/all/' + (page + 1))
-                i.right.chevron.icon
-                span Next
+      for item in submissions
+        .ui.card.clearing(style="width: 100%; margin-bottom: 20px;")
+          .content
+            .header
+              if suggestion
+                a(href='/browse/suggestion/' + item._id)= item.title
+              else
+                a(href='/browse/item/' + item._id)= item.title
+            if item.author
+              .meta!= 'submitted by <strong><em>' + item.author + '</em></strong> ' + locals.moment(item.timestamp).fromNow()
+            else
+              .meta!= 'submitted by <strong><em>someone</em></strong> ' + locals.moment(item.timestamp).fromNow()
+            .description.truncate= item.description
+      if suggestion && tag
+        a.ui.right.labeled.icon.button(href='/tags/suggestions/' + tag + '/' + (page + 1))
+          i.right.chevron.icon
+          span Next
+      else if tag
+        a.ui.right.labeled.icon.button(href='/tags/' + tag + '/' + (page + 1))
+          i.right.chevron.icon
+          span Next
+      else
+        a.ui.right.labeled.icon.button(href='/browse/all/' + (page + 1))
+          i.right.chevron.icon
+          span Next
