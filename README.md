@@ -14,9 +14,16 @@ You can view the DevPost submission [here](https://devpost.com/software/protect-
 
 Fork it and submit a pull request! You can also make suggestions and share ideas by opening an issue.
 
+### Branches
+
+`master`: the stable branch. Should be reliable.
+`develop`: the beta branch. Small features may be done within develop.
+`feature-X`: development of a particular feature. Usually in alpha or experimental until merged.
+
 ## Awards
 
 Protect Yourself was developed at the American East Hackathon, HackAE. Protect Yourself was awarded the following:
 
-- **HackAE's "First Place"**
-- **HackAE's "Best Education Hack"**
+- **Hack AE's "First Place"**
+- **Hack AE's "Best Education Hack"**
+
