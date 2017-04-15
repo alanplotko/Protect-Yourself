@@ -1,4 +1,4 @@
-const mongoose = require('../config/db').mongoose;
+const mongoose = require('mongoose');
 
 const checkupSchema = new mongoose.Schema({
     title: String,

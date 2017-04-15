@@ -49,7 +49,9 @@ module.exports = function(app) {
         } else if (req.params.step == 0) {
             res.redirect('/checkup');
         } else {
-            CheckupItem.findOne({step: req.params.step}, function(err, result) {
+            CheckupItem.findOne({
+                step: req.params.step
+            }, function(err, result) {
                 if (err || !result) {
                     return res.redirect('/done');
                 } else {
@@ -220,7 +222,7 @@ module.exports = function(app) {
             'tags': {
                 '$in': [req.params.tag]
             }
-        }).sort({'step': 1}).limit(3).skip((page - 1) * 3);
+        }).sort({ 'step': 1 }).limit(3).skip((page - 1) * 3);
         results.exec(function(err, result) {
             if (err) {
                 return res.redirect('/');
@@ -253,7 +255,7 @@ module.exports = function(app) {
             'tags': {
                 '$in': [req.params.tag]
             }
-        }).sort({'step': 1}).limit(3).skip((page - 1) * 3);
+        }).sort({ 'step': 1 }).limit(3).skip((page - 1) * 3);
         results.exec(function(err, result) {
             if (err) {
                 return res.redirect('/');
