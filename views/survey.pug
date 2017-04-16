@@ -1,0 +1,57 @@
+extends layout
+
+block styles
+  link(rel="stylesheet", href="/assets/css/survey.css")
+
+block content
+  .ui.text.container
+    .ui.raised.segments
+      .ui.sizer.vertical.segment
+        .ui.huge.inverted.header
+          i.info.circle.icon
+          .content= `${locals.properCase(track.name)} Track`
+      .ui.padded.segment.question
+        if track.status === 'submit'
+          .ui.warning.message
+            .header Track Submission Error
+            .
+              There was an error just as you were wrapping up. Your responses have been saved, so hit the complete button below to complete the track!
+        p= track.content
+      if track.status === 'start'
+        .ui.secondary.clearing.segment
+          .ui.right.floated.buttons
+            a.ui.right.labeled.icon.button(href=`/tracks/${track.name}/${track.progress}`)
+              i.right.arrow.icon
+              .
+                #{track.buttonLabel}
+      else if track.status === 'submit'
+        .ui.secondary.clearing.segment
+          .ui.right.floated.buttons
+            a.ui.right.labeled.icon.button(href=`/tracks/${track.name}/submit`)
+              i.right.arrow.icon
+              .
+                Complete
+      else if track.status === 'complete'
+        .ui.secondary.clearing.segment
+          .ui.right.floated.buttons
+            a.ui.right.labeled.icon.button(href=`/tracks/${track.name}/review`)
+              i.right.arrow.icon
+              .
+                Review
+      else
+        .ui.secondary.clearing.segment
+          .ui.left.floated.buttons
+            a.ui.blue.left.labeled.icon.button(href=track.link, target='_blank')
+              i.left.info.icon
+              .
+                Learn More
+          .ui.right.floated.buttons
+            a.ui.green.left.labeled.icon.button(href=`/tracks/${track.name}/${track.questionNo}/yes`)
+              i.left.check.icon
+              .
+                Yes
+            .or
+            a.ui.red.right.labeled.icon.button(href=`/tracks/${track.name}/${track.questionNo}/no`)
+              i.right.remove.icon
+              .
+                No

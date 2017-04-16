@@ -1,0 +1,24 @@
+extends layout
+
+block content
+  .ui.container
+    .ui.sizer.vertical.segment
+      .ui.huge.inverted.header
+        i.info.circle.icon
+        .content= `Review: ${locals.properCase(track.name)} Track`
+    table.ui.large.padded.celled.structured.table
+      thead
+        tr
+          th(rowspan='2') Q#
+          th(rowspan='2') Question
+          th(rowspan='2') Response
+          th(rowspan='2') Learn More
+      tbody
+        each question, index in track.questions
+          tr(class=(track.responses[index] === 'yes') ? 'positive' : 'negative')
+            td.center.aligned= index + 1
+            td= question.text
+            td.center.aligned(style='font-weight: bold;')= locals.properCase(track.responses[index])
+            td.center.aligned
+              a.ui.blue.icon.button(href=question.link, target='_blank')
+                i.info.icon
