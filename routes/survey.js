@@ -44,18 +44,26 @@ module.exports = function(app) {
         let track = {
             name: res.locals.trackName,
             content: res.locals.currentTrack.start,
-            link: null,
-            status: 'start',
-            buttonLabel: 'Start',   // Default label for new users
-            progress: 1             // New users start at first question
+            status: status
         };
+        let label = 'Start'; // Default label for new users
+        let link = `/tracks/${track.name}/1`; // Start at first question
+        let progress = req.session.tracks[track.name].progress;
+
+        // Allow users to resume progress (fetched from session)
         if (status === 'pending') {
-            // Allow users to resume progress (fetched from session)
-            track.buttonLabel = 'Resume';
-            track.progress = req.session.tracks[res.locals.trackName].progress;
+            label = 'Resume';
+            link = `/tracks/${track.name}/${progress}`;
+        } else if (status === 'submit') {
+            label = 'Complete';
+            link = `/tracks/${track.name}/submit`;
         }
 
-        return res.render('survey', { track: track });
+        return res.render('survey', {
+            track: track,
+            actionBtnLabel: label,
+            actionBtnLink: link
+        });
     });
 
     app.get('/tracks/:name/complete', setUpTrack, function(req, res) {
@@ -63,13 +71,19 @@ module.exports = function(app) {
         if (status !== 'complete') {
             return res.redirect(`/tracks/${res.locals.trackName}/start`)
         }
+
+        let track = {
+            name: res.locals.trackName,
+            content: res.locals.currentTrack.end,
+            status: status
+        };
+        let label = 'Review'; // If complete, users can review their responses
+        let link = `/tracks/${track.name}/review`; // Review url
+
         return res.render('survey', {
-            track: {
-                name: res.locals.trackName,
-                content: res.locals.currentTrack.end,
-                link: null,
-                status: 'complete'
-            }
+            track: track,
+            actionBtnLabel: label,
+            actionBtnLink: link
         });
     });
 
@@ -78,12 +92,15 @@ module.exports = function(app) {
         if (status !== 'complete') {
             return res.redirect(`/tracks/${res.locals.trackName}/start`)
         }
+
+        let track = {
+            name: res.locals.trackName,
+            questions: res.locals.currentTrack.questions
+        };
+
         return res.render('summary', {
-            track: {
-                name: res.locals.trackName,
-                questions: res.locals.currentTrack.questions,
-                responses: req.session.tracks[res.locals.trackName].responses
-            }
+            track: track,
+            responses: req.session.tracks[res.locals.trackName].responses
         });
     });
 
@@ -122,32 +139,34 @@ module.exports = function(app) {
             return res.redirect(`/tracks/${res.locals.trackName}/start`);
         }
 
-
         // Check if already complete
         if (req.session.tracks[res.locals.trackName].status === 'complete') {
             return res.redirect(`/tracks/${res.locals.trackName}/complete`);
         }
 
         // Validate question number
-        let qNo = parseInt(req.sanitizeParams('question'));
-        let idx = qNo - 1;
+        let questionNo = parseInt(req.sanitizeParams('question'));
+        let idx = questionNo - 1;
         let progress = req.session.tracks[res.locals.trackName].progress;
         if (idx > res.locals.currentTrack.questions.length || idx < 0 ||
-            qNo != progress) {
+            questionNo != progress) {
             return res.redirect(`/tracks/${res.locals.trackName}/${progress}`);
         }
 
         // Ensure user marked for starting track
         req.session.tracks[res.locals.trackName].status = 'pending';
 
+        let track = {
+            name: res.locals.trackName,
+            content: res.locals.currentTrack.questions[idx].text,
+            status: req.session.tracks[res.locals.trackName].status
+        };
+        let link = `/tracks/${track.name}/${questionNo}`;
+
         return res.render('survey', {
-            track: {
-                name: res.locals.trackName,
-                content: res.locals.currentTrack.questions[idx].text,
-                link: res.locals.currentTrack.questions[idx].link,
-                status: 'pending',
-                questionNo: qNo
-            }
+            track: track,
+            baseResponseLink: link,
+            learnMoreBtnLink: res.locals.currentTrack.questions[idx].link
         });
     });
 

@@ -11,47 +11,47 @@ block content
           i.info.circle.icon
           .content= `${locals.properCase(track.name)} Track`
       .ui.padded.segment.question
-        if track.status === 'submit'
-          .ui.warning.message
-            .header Track Submission Error
-            .
-              There was an error just as you were wrapping up. Your responses have been saved, so hit the complete button below to complete the track!
+        //- If we don't receive the base link yes/no links, then we must be on the start page
+        if !baseResponseLink
+          //- Show a relevant message based on their progress in the track
+          if track.status === 'submit'
+            .ui.warning.message
+              .header Track Submission Error
+              .
+                There was an error just as you were wrapping up. Your responses have been saved, so hit the button below to complete the track!
+          else if track.status === 'complete'
+            .ui.positive.message
+              .header Completed!
+              .
+                You've successfully completed the <strong>#{locals.properCase(track.name)} Track</strong>! Feel free to access the track materials below.
+          else if track.status === 'pending'
+            .ui.info.message
+              .header You're almost there!
+              .
+                You've previously started the <strong>#{locals.properCase(track.name)} Track</strong>! Hit the button below to continue from where you left off!
         p= track.content
-      if track.status === 'start'
-        .ui.secondary.clearing.segment
-          .ui.right.floated.buttons
-            a.ui.right.labeled.icon.button(href=`/tracks/${track.name}/${track.progress}`)
-              i.right.arrow.icon
-              .
-                #{track.buttonLabel}
-      else if track.status === 'submit'
-        .ui.secondary.clearing.segment
-          .ui.right.floated.buttons
-            a.ui.right.labeled.icon.button(href=`/tracks/${track.name}/submit`)
-              i.right.arrow.icon
-              .
-                Complete
-      else if track.status === 'complete'
-        .ui.secondary.clearing.segment
-          .ui.right.floated.buttons
-            a.ui.right.labeled.icon.button(href=`/tracks/${track.name}/review`)
-              i.right.arrow.icon
-              .
-                Review
-      else
-        .ui.secondary.clearing.segment
-          .ui.left.floated.buttons
-            a.ui.blue.left.labeled.icon.button(href=track.link, target='_blank')
-              i.left.info.icon
-              .
-                Learn More
-          .ui.right.floated.buttons
-            a.ui.green.left.labeled.icon.button(href=`/tracks/${track.name}/${track.questionNo}/yes`)
+      .ui.secondary.clearing.segment
+        //- If we receive a link to learn more, display the learn more button on the left
+        if learnMoreBtnLink
+          a.ui.blue.right.labeled.icon.button(href=learnMoreBtnLink, target='_blank')
+            i.right.arrow.icon
+            .
+              Learn More
+        .ui.right.floated.buttons
+          //- If we have a base response link, then we can generate the yes/no buttons
+          if baseResponseLink
+            a.ui.green.left.labeled.icon.button(href=`${baseResponseLink}/yes`)
               i.left.check.icon
               .
                 Yes
             .or
-            a.ui.red.right.labeled.icon.button(href=`/tracks/${track.name}/${track.questionNo}/no`)
+            a.ui.red.right.labeled.icon.button(href=`${baseResponseLink}/no`)
               i.right.remove.icon
               .
                 No
+          //- Otherwise, if there's no base response link, we're showing a single action button
+          else
+            a.ui.right.labeled.icon.button(href=actionBtnLink)
+              i.right.arrow.icon
+              .
+                #{actionBtnLabel}
