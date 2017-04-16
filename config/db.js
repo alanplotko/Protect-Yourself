@@ -10,8 +10,11 @@ module.exports = {
 
         app.use(session({
             secret: connection.MONGO_SECRET,
-            cookie: { maxAge: 60 * 1000 * 60 * 48 },
-            store: new MongoStore({ mongooseConnection: mongoose.connection }),
+            // Sessions expire in 2 weeks (in ms)
+            cookie: { maxAge: 14 * 24 * 60 * 60 * 1000 },
+            store: new MongoStore({
+                mongooseConnection: mongoose.connection
+            }),
             resave: false,
             saveUninitialized: false
         }));
