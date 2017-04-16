@@ -1,17 +1,14 @@
 const CheckupItem = require('../models/checkup_item').CheckupItem;
 const SuggestionItem = require('../models/suggestion_item').SuggestionItem;
-const singleLineString = require('../common/utilities').singleLineString;
+const stripNewlines = require('strip-newlines');
 
 module.exports = function(app) {
     app.get('/', function(req, res) {
-        res.render('index', {
-            path: res.locals.path
-        });
+        res.render('index');
     });
 
     app.get('/checkup/facebook', function(req, res) {
         res.render('check-site', {
-            path: res.locals.path,
             header: 'Are your Facebook posts public?',
             subtitle: 'Let\'s take a look!',
             service: 'Facebook',
@@ -21,17 +18,23 @@ module.exports = function(app) {
     });
 
     app.post('/checkup/facebook', function(req, res) {
-        return res.redirect('https://www.facebook.com/' + req.body.data
-            + '?viewas=100000686899395');
+        // Handle errors for username
+        req.checkBody('data').notEmpty();
+        let error = req.validationErrors();
+        if (error) {
+            return res.redirect('/checkup/facebook');
+        }
+        let username = req.sanitizeBody('data').trim();
+        return res.redirect(stripNewlines`https://www.facebook.com/${username}
+            ?viewas=100000686899395`);
     });
 
     app.get('/checkup', function(req, res) {
         res.render('checkup', {
-            path: res.locals.path,
             current: {
                 step: {
                     title: 'Online Check Up',
-                    description: singleLineString `We'll walk you through some
+                    description: stripNewlines`We'll walk you through some
                         of the things to watch out for when giving out your
                         personal information.<br /><br />Not many people know
                         of the extent of the information companies or online
@@ -56,7 +59,6 @@ module.exports = function(app) {
                     return res.redirect('/done');
                 } else {
                     return res.render('checkup', {
-                        path: res.locals.path,
                         current: {
                             step: result,
                             idx: parseInt(req.params.step)
@@ -86,7 +88,6 @@ module.exports = function(app) {
                 return res.redirect('/');
             } else {
                 return res.render('browse', {
-                    path: res.locals.path,
                     submissions: result,
                     page: page,
                     suggestion: true
@@ -103,7 +104,6 @@ module.exports = function(app) {
                 return res.redirect('/browse/all/1');
             } else {
                 return res.render('checkup', {
-                    path: res.locals.path,
                     current: {
                         step: result,
                         suggestion: true
@@ -121,7 +121,6 @@ module.exports = function(app) {
                 return res.redirect('/browse/all/1');
             } else {
                 return res.render('checkup', {
-                    path: res.locals.path,
                     current: {
                         step: result
                     }
@@ -136,7 +135,6 @@ module.exports = function(app) {
                 return res.redirect('/browse/all/1');
             } else {
                 return res.render('checkup', {
-                    path: res.locals.path,
                     current: {
                         step: result,
                         suggestion: true
@@ -147,9 +145,7 @@ module.exports = function(app) {
     });
 
     app.get('/submit', function(req, res) {
-        res.render('submit', {
-            path: res.locals.path
-        });
+        res.render('submit');
     });
 
     app.post('/submit', function(req, res) {
@@ -194,13 +190,11 @@ module.exports = function(app) {
         submission.save(function(err) {
             if (err) {
                 return res.render('submit', {
-                    path: res.locals.path,
                     content: req.body,
                     errors: err
                 });
             } else {
                 return res.render('submit', {
-                    path: res.locals.path,
                     complete: true
                 });
             }
@@ -230,7 +224,6 @@ module.exports = function(app) {
                 return res.redirect('/');
             } else {
                 return res.render('browse', {
-                    path: res.locals.path,
                     submissions: result,
                     tag: req.params.tag,
                     page: page,
@@ -263,7 +256,6 @@ module.exports = function(app) {
                 return res.redirect('/');
             } else {
                 return res.render('browse', {
-                    path: res.locals.path,
                     submissions: result,
                     tag: req.params.tag,
                     page: page
@@ -273,8 +265,6 @@ module.exports = function(app) {
     });
 
     app.get('/done', function(req, res) {
-        res.render('done', {
-            path: res.locals.path
-        });
+        res.render('done');
     });
 };
