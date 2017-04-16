@@ -35,6 +35,7 @@ db.initialize(app);
 // App locals
 app.locals.title = 'Protect Yourself';
 app.locals.moment = moment;
+app.locals.properCase = str => str.charAt(0).toUpperCase() + str.substring(1);
 app.locals.navigation = [{
     title: 'Home',
     url: '/'
