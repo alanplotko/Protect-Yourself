@@ -39,6 +39,9 @@ app.locals.properCase = str => str.charAt(0).toUpperCase() + str.substring(1);
 app.locals.navigation = [{
     title: 'Home',
     url: '/'
+}, {
+    title: 'Tracks',
+    url: '/tracks'
 }];
 /* }, {
     title: 'Checkup',
@@ -56,7 +59,7 @@ app.locals.navigation = [{
 
 // Routes
 require(dir + '/routes/general')(app);
-require(dir + '/routes/survey')(app);
+require(dir + '/routes/tracks')(app);
 
 const port = 3000;
 app.listen(port, function() {

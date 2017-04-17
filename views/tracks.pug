@@ -1,0 +1,22 @@
+extends layout
+
+block content
+  .ui.container
+    .ui.four.doubling.stackable.cards
+      for track in tracks
+        .card
+          a(href=`/tracks/${track.slug}/start`).image
+            img(src=`/assets/img/${track.banner}`)
+          .content
+            a.header(href=`/tracks/${track.slug}/start`)= `${track.name} Track`
+            .meta
+              span Lorem Ipsum
+            .description= track.description
+          .extra.content
+            if track.percentage == 0
+              span.right.floated Not Started
+            else
+              span.right.floated= `${track.percentage}% done`
+            span
+              i.help.icon
+              | #{track.questions} questions
