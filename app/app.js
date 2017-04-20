@@ -61,10 +61,7 @@ app.locals.navigation = [{
 require(dir + '/routes/general')(app);
 require(dir + '/routes/tracks')(app);
 
-const port = 3000;
-if (process.env.PY_ON_HEROKU) {
-    port = process.env.PORT;
-}
+const port = process.env.PORT || 3000;
 app.listen(port, function() {
     console.log(`Running on localhost:${port}`);
 });
