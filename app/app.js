@@ -62,6 +62,9 @@ require(dir + '/routes/general')(app);
 require(dir + '/routes/tracks')(app);
 
 const port = 3000;
+if (process.env.PY_ON_HEROKU) {
+    port = process.env.PORT;
+}
 app.listen(port, function() {
     console.log(`Running on localhost:${port}`);
 });
