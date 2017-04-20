@@ -37,7 +37,8 @@
   },
   "scripts": {
     "test": "./node_modules/.bin/mocha test",
-    "start": "./node_modules/.bin/nodemon app/app.js",
+    "start": "node app/app.js",
+    "dev": "./node_modules/.bin/nodemon app/app.js",
     "generate_content": "node scripts/generate_content.js",
     "clear_responses": "node scripts/clear_responses.js"
   },
