@@ -60,7 +60,7 @@ module.exports = function(app) {
                     percentage: Math.ceil((numResponses / numQuestions) * 100)
                 });
             });
-            return res.render('tracks', {
+            return res.render('track-listing', {
                 tracks: tracks,
                 error: err
             });
@@ -91,7 +91,7 @@ module.exports = function(app) {
             link = `/tracks/${res.locals.trackSlug}/submit`;
         }
 
-        return res.render('survey', {
+        return res.render('track', {
             track: track,
             actionBtnLabel: label,
             actionBtnLink: link
@@ -112,7 +112,7 @@ module.exports = function(app) {
         let label = 'Review'; // If complete, users can review their responses
         let link = `/tracks/${res.locals.trackSlug}/review`; // Review URL
 
-        return res.render('survey', {
+        return res.render('track', {
             track: track,
             actionBtnLabel: label,
             actionBtnLink: link
@@ -195,7 +195,7 @@ module.exports = function(app) {
         };
         let link = `/tracks/${res.locals.trackSlug}/${questionNo}`;
 
-        return res.render('survey', {
+        return res.render('track', {
             track: track,
             baseResponseLink: link,
             learnMoreBtnLink: res.locals.currentTrack.questions[idx].link

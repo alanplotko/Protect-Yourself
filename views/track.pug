@@ -1,7 +1,7 @@
 extends layout
 
 block styles
-  link(rel="stylesheet", href="/assets/css/survey.css")
+  link(rel="stylesheet", href="/assets/css/track.css")
 
 block content
   .ui.text.container
@@ -40,15 +40,9 @@ block content
         .ui.right.floated.buttons
           //- If we have a base response link, then we can generate the yes/no buttons
           if baseResponseLink
-            a.ui.green.left.labeled.icon.button(href=`${baseResponseLink}/yes`)
-              i.left.check.icon
-              .
-                Yes
+            a.ui.blue.button(href=`${baseResponseLink}/yes`) Yes
             .or
-            a.ui.red.right.labeled.icon.button(href=`${baseResponseLink}/no`)
-              i.right.remove.icon
-              .
-                No
+            a.ui.blue.button(href=`${baseResponseLink}/no`) No
           //- Otherwise, if there's no base response link, we're showing a single action button
           else
             a.ui.right.labeled.icon.button(href=actionBtnLink)
