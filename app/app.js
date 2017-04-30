@@ -60,6 +60,12 @@ app.locals.navigation = [{
 // Routes
 require(dir + '/routes/general')(app);
 require(dir + '/routes/tracks')(app);
+// require(dir + '/routes/checkup')(app);
+
+// Resolve to error page if route not found
+app.use(function (req, res) {
+    res.render('error');
+});
 
 const port = process.env.PORT || 3000;
 app.listen(port, function() {
