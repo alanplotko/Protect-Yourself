@@ -57,27 +57,8 @@ let tasks = [];
 let docs = [];
 
 // Set up general track
-docs.push(new Track({
-    name: 'General',
-    slug: 'general',
-    banner: 'generic-track-banner.jpg',
-    description: loremIpsum({
-        count: randIntInclusive(15, 25),
-        units: 'word',
-        format: 'plain'
-    }),
-    start: loremIpsum({
-        count: randIntInclusive(1, 3),
-        units: 'paragraph',
-        format: 'plain'
-    }),
-    end: loremIpsum({
-        count: 1,
-        units: 'paragraph',
-        format: 'plain'
-    }),
-    questions: generateQuestions(randIntInclusive(5, 15))
-}));
+const general = require('./tracks/general.json');
+docs.push(new Track(general));
 
 // Set up other tracks
 for (let i = 1; i <= numIterations; i++) {
