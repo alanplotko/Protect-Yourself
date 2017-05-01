@@ -51,12 +51,18 @@ module.exports = function(app) {
                     numResponses = req.session.tracks[track.slug]
                         .responses.length;
                 }
+                let status = null;
+                if (req.session.tracks[track.slug] &&
+                    req.session.tracks[track.slug].status) {
+                    status = req.session.tracks[track.slug].status;
+                }
                 tracks.push({
                     name: track.name,
                     slug: track.slug,
                     questions: numQuestions,
                     banner: track.banner,
                     description: track.description,
+                    status: status,
                     percentage: Math.ceil((numResponses / numQuestions) * 100)
                 });
             });
@@ -160,7 +166,8 @@ module.exports = function(app) {
         req.checkBody('gender').optional({ checkFalsy: true });
         req.checkBody('age').optional({ checkFalsy: true })
             .isInt().range(1, 200);
-        req.checkBody('zip_code').optional({ checkFalsy: true }).isInt().len(5);
+        req.checkBody('zip_code').optional({ checkFalsy: true })
+            .isInt().positive().len(5);
         let error = req.validationErrors();
         if (error) {
             return res.render('track', {
@@ -299,6 +306,7 @@ module.exports = function(app) {
         if (idx + 1 >= numQuestions) {
             // Move to extra questions if about to submit without profile
             if (!req.session.hasOwnProperty('profile')) {
+                req.session.tracks[res.locals.trackSlug].status = 'submit';
                 return res.redirect(`/tracks/${res.locals.trackSlug}/extra`);
             }
 

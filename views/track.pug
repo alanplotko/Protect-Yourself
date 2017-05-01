@@ -30,10 +30,16 @@ block content
               .
                 You've previously started the <strong>#{track.name} Track</strong>! Hit the button below to continue from where you left off!
         else if extraInfo
+          .ui.info.message
+            .header Optional Information
+            p Feel free to provide additional information to contribute to our research.
+          if error
+            .ui.error.message
+              .header There seems to be a problem
+              ul.list
+                for err in error
+                  li= `${locals.properCase(err.param.replace('_', ' '))}: ${err.msg}`
           form.ui.form(method='POST')
-            .ui.info.message
-              .header Optional Information
-              p Feel free to provide additional information to contribute to our research.
             .equal.width.fields
               .field
                 label Gender
@@ -52,7 +58,6 @@ block content
                 label Zip Code
                 input(type='text', name='zip_code', placeholder='Zip Code')
             .ui.error.message
-              .header There seems to be a problem
             .ui.primary.right.labeled.icon.submit.button
               i.right.arrow.icon
               .

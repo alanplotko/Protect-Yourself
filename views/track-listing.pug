@@ -11,8 +11,10 @@ block content
             a.header(href=`/tracks/${track.slug}/start`)= `${track.name} Track`
             .description= track.description
           .extra.content
-            if track.percentage == 0
+            if track.percentage === 0
               span.right.floated Not Started
+            else if track.percentage === 100 && track.status && track.status === 'submit'
+              span.right.floated Must Resubmit
             else
               span.right.floated= `${track.percentage}% done`
             span

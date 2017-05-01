@@ -30,6 +30,9 @@ app.use(expressValidator({
     customValidators: {
         range: function(param, min, max) {
             return param >= min && param <= max;
+        },
+        positive: function(param) {
+            return param > 0;
         }
     }
 }));
