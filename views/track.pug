@@ -51,12 +51,8 @@ block content
               .field
                 label Zip Code
                 input(type='text', name='zip_code', placeholder='Zip Code')
-          if error
             .ui.error.message
               .header There seems to be a problem
-              ul.list
-                for err in error
-                  li= `${locals.properCase(err.param.replace('_', ' '))}: ${err.msg}`
             .ui.primary.right.labeled.icon.submit.button
               i.right.arrow.icon
               .
