@@ -5,8 +5,11 @@ const responseSchema = new mongoose.Schema({
     answer: String, // The user's answer (e.g. 'yes', 'no')
 
     // Provided demographics
-    age: Number,
-    gender: String
+    profile: {
+        gender: String,
+        age: Number,
+        zipCode: String
+    }
 });
 
 module.exports.Response = mongoose.model('Response', responseSchema);

@@ -39,6 +39,7 @@ function randIntInclusive(low, high) {
 function generateQuestions(num) {
     let questions = [];
     for (let i = 0; i < num; i++) {
+        let expected = randIntInclusive(0, 1);
         questions.push({
             text: loremIpsum({
                 count: randIntInclusive(1, 2),
@@ -46,6 +47,7 @@ function generateQuestions(num) {
                 format: 'plain'
             }),
             link: 'http://google.com/',
+            expected: (expected === 0) ? 'yes' : 'no',
             responses: []
         });
     }

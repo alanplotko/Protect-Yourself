@@ -26,7 +26,13 @@ app.use(function(req, res, next) {
     next();
 });
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(expressValidator());
+app.use(expressValidator({
+    customValidators: {
+        range: function(param, min, max) {
+            return param >= min && param <= max;
+        }
+    }
+}));
 
 // Database setup
 let db = require(dir + '/config/db');

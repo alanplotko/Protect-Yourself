@@ -88,11 +88,12 @@ module.exports = function(app) {
             link = `/tracks/${res.locals.trackSlug}/${progress}`;
         } else if (status === 'submit') {
             label = 'Complete';
-            link = `/tracks/${res.locals.trackSlug}/submit`;
+            link = `/tracks/${res.locals.trackSlug}/extra`;
         }
 
         return res.render('track', {
             track: track,
+            pageTitle: `${track.name} Track`,
             actionBtnLabel: label,
             actionBtnLink: link
         });
@@ -114,6 +115,7 @@ module.exports = function(app) {
 
         return res.render('track', {
             track: track,
+            pageTitle: `${track.name} Track`,
             actionBtnLabel: label,
             actionBtnLink: link
         });
@@ -136,19 +138,77 @@ module.exports = function(app) {
         });
     });
 
+    app.get('/tracks/:slug/extra', setUpTrack, function(req, res) {
+        if (req.session.hasOwnProperty('profile')) {
+            return res.redirect(`/tracks/${res.locals.trackSlug}/submit`);
+        }
+
+        return res.render('track', {
+            track: null,
+            extraInfo: true,
+            error: null,
+            pageTitle: `${res.locals.trackName} Track`
+        });
+    });
+
+    app.post('/tracks/:slug/extra', setUpTrack, function(req, res) {
+        if (req.session.hasOwnProperty('profile')) {
+            return res.redirect(`/tracks/${res.locals.trackSlug}/submit`);
+        }
+
+        // Handle errors for demographics
+        req.checkBody('gender').optional({ checkFalsy: true });
+        req.checkBody('age').optional({ checkFalsy: true })
+            .isInt().range(1, 200);
+        req.checkBody('zip_code').optional({ checkFalsy: true }).isInt().len(5);
+        let error = req.validationErrors();
+        if (error) {
+            return res.render('track', {
+                track: null,
+                extraInfo: true,
+                error: error,
+                pageTitle: `${res.locals.trackName} Track`
+            });
+        }
+
+        // Validate demographics and set up profile
+        const gender = req.sanitizeBody('gender').trim();
+        const age = req.sanitizeBody('age').trim();
+        const zipCode = req.sanitizeBody('zip_code').trim();
+
+        req.session.profile = {
+            gender: gender,
+            age: age,
+            zipCode: zipCode
+        };
+
+        req.session.tracks[res.locals.trackSlug].status = 'submit';
+
+        return res.redirect(`/tracks/${res.locals.trackSlug}/submit`);
+    });
+
     app.get('/tracks/:slug/submit', setUpTrack, function(req, res) {
         let status = req.session.tracks[res.locals.trackSlug].status;
         if (status !== 'submit') {
             return res.redirect(`/tracks/${res.locals.trackSlug}/start`)
+        } else if (!req.session.hasOwnProperty('profile')) {
+            return res.redirect(`/tracks/${res.locals.trackSlug}/extra`);
         }
 
         let numQuestions = res.locals.currentTrack.questions.length;
         let tasks = [];
         let userResponses = req.session.tracks[res.locals.trackSlug].responses;
+
+        let profile = null;
+        if (req.session.hasOwnProperty('profile')) {
+            profile = req.session.profile;
+        }
+
         for (let i = 0; i < numQuestions; i++) {
             let response = new Response({
                 user: req.session._id,
-                answer: userResponses[i]
+                answer: userResponses[i],
+                profile: profile
             });
             res.locals.currentTrack.questions[i].responses.push(response);
         }
@@ -197,6 +257,7 @@ module.exports = function(app) {
 
         return res.render('track', {
             track: track,
+            pageTitle: `${track.name} Track`,
             baseResponseLink: link,
             learnMoreBtnLink: res.locals.currentTrack.questions[idx].link
         });
@@ -236,10 +297,21 @@ module.exports = function(app) {
         let tasks = [];
         let userResponses = req.session.tracks[res.locals.trackSlug].responses;
         if (idx + 1 >= numQuestions) {
+            // Move to extra questions if about to submit without profile
+            if (!req.session.hasOwnProperty('profile')) {
+                return res.redirect(`/tracks/${res.locals.trackSlug}/extra`);
+            }
+
+            let profile = null;
+            if (req.session.hasOwnProperty('profile')) {
+                profile = req.session.profile;
+            }
+
             for (let i = 0; i < numQuestions; i++) {
                 let response = new Response({
                     user: req.session._id,
-                    answer: userResponses[i]
+                    answer: userResponses[i],
+                    profile: profile
                 });
                 res.locals.currentTrack.questions[i].responses.push(response);
             }

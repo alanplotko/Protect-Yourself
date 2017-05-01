@@ -15,7 +15,7 @@ block content
           th(rowspan='2') Learn More
       tbody
         each question, index in track.questions
-          tr(class=(responses[index] === 'yes') ? 'positive' : 'negative')
+          tr(class=(responses[index] === question.expected) ? 'positive' : 'negative')
             td.center.aligned= index + 1
             td= question.text
             td.center.aligned(style='font-weight: bold;')= locals.properCase(responses[index])

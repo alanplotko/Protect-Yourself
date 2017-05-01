@@ -8,42 +8,50 @@
     "questions" : [
         {
             "text" : "The Democratic National Committee (DNC) fell victim to a cyberattack called spear phishing where fake emails were sent to over 1,000 email accounts. These emails contained malicious attachments that would enable the hackers to install malware and steal emails. Do you know how to identify malicious emails?",
-            "link" : "http://google.com/",
+            "link" : "https://support.google.com/mail/answer/8253",
+            "expected" : "yes",
             "responses" : []
         },
         {
             "text" : "Many celebrities had their private photos leaked when hackers breached their iCloud accounts. You can better secure your accounts from hackers by using Two Factor Authentication (2FA). Even if your credentials are stolen, 2FA adds a second layer of security that prevents hackers from completing the login. Do you use 2FA to secure your accounts?",
-            "link" : "http://google.com/",
+            "link" : "https://www.cnet.com/news/two-factor-authentication-what-you-need-to-know-faq/",
+            "expected" : "yes",
             "responses" : []
         },
         {
             "text" : "About 99.3% of the smartphone market is dominated by Android and iOS devices. These devices rely on location services to collect the data needed to support the updates you receive on traffic, daily commutes, weather, and recommendations. However, not many feel comfortable having their location history throughout the day saved. Do you know how to restrict or disable location history on your personal devices?",
-            "link" : "http://google.com/",
+            "link" : "https://support.google.com/accounts/answer/3118687",
+            "expected" : "yes",
             "responses" : []
         },
         {
             "text" : "Lots of people use Facebook nowadays - there are 1.86 billion monthly active users! Facebook users post updates and share photos with their friends and family. However, depending on when you signed up, your default audience may be more than just close friends. Your posts may be visible to anyone and everyone, regardless of whether they have you as a friend or are logged in to Facebook. Do you know how to update your audience settings on Facebook?",
-            "link" : "http://google.com/",
-            "responses" : []
-        },
-        {
-            "text" : "In April 2017, security experts discovered that browsers are vulnerable to homograph attacks where hackers can register domain names to pose as popular websites like apple.com. When visiting these fake look-alike websites, you may still see a lock to the left of the URL, which reinforces the website's authenticity. Do you know how to identify fake websites by checking the URL or website's SSL (Secure Sockets Layer) certificate?",
-            "link" : "http://google.com/",
+            "link" : "https://www.facebook.com/help/120939471321735",
+            "expected" : "yes",
             "responses" : []
         },
         {
             "text" : "Amazon.com has over 300 million active customers. As a popular online retailer, Amazon must establish trust with the customer as a secure platform for making purchases. However, many online retailers do not secure their website with SSL (Secure Sockets Layer), which the browser indicates with the lock to the left of the URL. SSL encrypts information sent to and received from the website so that your transaction details, like your credit card number, are not susceptible to hackers. Do you check for the lock next to the URL in your browser when you enter personal information?",
-            "link" : "http://google.com/",
+            "link" : "https://support.google.com/chrome/answer/95617",
+            "expected" : "yes",
             "responses" : []
         },
         {
-            "text" : "People tend to create passwords that are easy to remember. However, incorporating words found in a dictionary can make your password susceptible to attacks. Passwords should be long and should contain a mix of uppercase and lowercase letters, numbers, and symbols. Adding more dictionary words to your password does not make it more secure as people tend to think. Given a really long password made up of dictionary words, a shorter password that does not use dictionary words can be exceptionally harder to break. You can always use a mnemonic to help you remember your password. Are you familiar with the rules for building a strong password?",
-            "link" : "http://google.com/",
+            "text" : "In April 2017, security experts discovered that browsers are vulnerable to homograph attacks where hackers can register domain names to pose as popular websites like apple.com. When visiting these fake look-alike websites, you may still see a lock to the left of the URL, which reinforces the website's authenticity. Do you know how to identify fake websites?",
+            "link" : "https://www.xudongz.com/blog/2017/idn-phishing/",
+            "expected" : "yes",
+            "responses" : []
+        },
+        {
+            "text" : "People tend to create passwords that are easy to remember. However, incorporating words found in a dictionary can make your password susceptible to attacks. Adding more dictionary words to your password does not make it more secure as people tend to think. Given a long password made up of dictionary words, a shorter password that does not use dictionary words can be exceptionally harder to break. Are you familiar with the rules for building a strong password?",
+            "link" : "https://support.google.com/accounts/answer/32040",
+            "expected" : "yes",
             "responses" : []
         },
         {
             "text" : "People tend to reuse passwords across services. This is generally not safe because one compromised password means that your other accounts are also unsafe. The celebrities whose iCloud accounts were hacked was a result of reusing their Find My iPhone passwords for iCloud. Do you reuse your passwords across services?",
-            "link" : "http://google.com/",
+            "link" : "http://www.pcworld.com/article/2183926/apple-says-its-not-to-blame-in-idevice-ransom-attacks.html",
+            "expected" : "no",
             "responses" : []
         }
     ]

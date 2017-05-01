@@ -9,8 +9,6 @@ block content
             img(src=`/assets/img/${track.banner}`)
           .content
             a.header(href=`/tracks/${track.slug}/start`)= `${track.name} Track`
-            .meta
-              span Lorem Ipsum
             .description= track.description
           .extra.content
             if track.percentage == 0
