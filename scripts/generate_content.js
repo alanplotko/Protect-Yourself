@@ -54,7 +54,7 @@ function generateQuestions(num) {
     return questions;
 }
 
-let numIterations = 1;//randIntInclusive(MIN, MAX);
+// let numIterations = randIntInclusive(MIN, MAX);
 let tasks = [];
 let docs = [];
 
@@ -63,35 +63,35 @@ const general = require('./tracks/general.json');
 docs.push(new Track(general));
 
 // Set up other tracks
-for (let i = 1; i <= numIterations; i++) {
-    let idx = randIntInclusive(0, buzzwords.length - 1);
-    let name = buzzwords[idx];
-    buzzwords.splice(idx, 1);
-    docs.push(new Track({
-        name: name,
-        slug: name.toLowerCase().replace(' ', '-'),
-        banner: 'general-track.jpg',
-        description: loremIpsum({
-            count: randIntInclusive(15, 25),
-            units: 'word',
-            format: 'plain'
-        }),
-        start: loremIpsum({
-            count: randIntInclusive(1, 3),
-            units: 'paragraph',
-            format: 'plain'
-        }),
-        end: loremIpsum({
-            count: 1,
-            units: 'paragraph',
-            format: 'plain'
-        }),
-        questions: generateQuestions(randIntInclusive(5, 15))
-    }));
-}
+// for (let i = 1; i <= numIterations; i++) {
+//     let idx = randIntInclusive(0, buzzwords.length - 1);
+//     let name = buzzwords[idx];
+//     buzzwords.splice(idx, 1);
+//     docs.push(new Track({
+//         name: name,
+//         slug: name.toLowerCase().replace(' ', '-'),
+//         banner: 'general-track.jpg',
+//         description: loremIpsum({
+//             count: randIntInclusive(15, 25),
+//             units: 'word',
+//             format: 'plain'
+//         }),
+//         start: loremIpsum({
+//             count: randIntInclusive(1, 3),
+//             units: 'paragraph',
+//             format: 'plain'
+//         }),
+//         end: loremIpsum({
+//             count: 1,
+//             units: 'paragraph',
+//             format: 'plain'
+//         }),
+//         questions: generateQuestions(randIntInclusive(5, 15))
+//     }));
+// }
 
 // Number of tracks (plus required general track)
-let numTracks = numIterations + 1;
+let numTracks = 1; // numIterations + 1;
 let numInserted = 0;
 
 for (let i = 0; i < docs.length; i++) {
