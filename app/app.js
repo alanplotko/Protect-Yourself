@@ -44,7 +44,7 @@ db.initialize(app);
 // App locals
 app.locals.title = 'Protect Yourself';
 app.locals.moment = moment;
-app.locals.properCase = str => str.charAt(0).toUpperCase() + str.substring(1);
+app.locals.properCase = (str) => str.charAt(0).toUpperCase() + str.substring(1);
 app.locals.navigation = [{
     title: 'Home',
     url: '/'
@@ -72,7 +72,7 @@ require(dir + '/routes/tracks')(app);
 // require(dir + '/routes/checkup')(app);
 
 // Resolve to error page if route not found
-app.use(function (req, res) {
+app.use(function(req, res) {
     res.render('error');
 });
 

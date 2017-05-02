@@ -1,6 +1,5 @@
 const Track = require('../models/track').Track;
 const Profile = require('../models/profile').Profile;
-const async = require('async');
 
 let setUpTrack = function(req, res, next) {
     // Handle errors for track slug
@@ -21,10 +20,13 @@ let setUpTrack = function(req, res, next) {
         }
 
         if (!req.session.tracks.hasOwnProperty(slug)) {
+            let numQuestions = track.questions.length;
             req.session.tracks[slug] = {
                 progress: 1,
                 status: 'start',
-                responses: []
+                responses: [],
+                inQuestionClicks: Array(numQuestions).fill(0),
+                inSummaryClicks: Array(numQuestions).fill(0)
             };
         }
 
@@ -33,7 +35,7 @@ let setUpTrack = function(req, res, next) {
         res.locals.currentTrack = track;
         next();
     });
-}
+};
 
 module.exports = function(app) {
     app.get('/tracks', function(req, res) {
@@ -76,7 +78,7 @@ module.exports = function(app) {
     app.get('/tracks/:slug/start', setUpTrack, function(req, res) {
         let status = req.session.tracks[res.locals.trackSlug].status;
         if (status === 'complete') {
-            return res.redirect(`/tracks/${res.locals.trackSlug}/complete`)
+            return res.redirect(`/tracks/${res.locals.trackSlug}/complete`);
         }
 
         let track = {
@@ -108,7 +110,7 @@ module.exports = function(app) {
     app.get('/tracks/:slug/complete', setUpTrack, function(req, res) {
         let status = req.session.tracks[res.locals.trackSlug].status;
         if (status !== 'complete') {
-            return res.redirect(`/tracks/${res.locals.trackSlug}/start`)
+            return res.redirect(`/tracks/${res.locals.trackSlug}/start`);
         }
 
         let track = {
@@ -130,7 +132,7 @@ module.exports = function(app) {
     app.get('/tracks/:slug/review', setUpTrack, function(req, res) {
         let status = req.session.tracks[res.locals.trackSlug].status;
         if (status !== 'complete') {
-            return res.redirect(`/tracks/${res.locals.trackSlug}/start`)
+            return res.redirect(`/tracks/${res.locals.trackSlug}/start`);
         }
 
         let track = {
@@ -145,7 +147,8 @@ module.exports = function(app) {
     });
 
     app.get('/tracks/:slug/extra', setUpTrack, function(req, res) {
-        if (req.session.hasOwnProperty('profile')) {
+        if (req.session.hasOwnProperty('profile') ||
+            req.session.hasOwnProperty('profileId')) {
             return res.redirect(`/tracks/${res.locals.trackSlug}/submit`);
         }
 
@@ -157,8 +160,16 @@ module.exports = function(app) {
         });
     });
 
+    app.get('/tracks/:slug/out', setUpTrack, function(req, res) {
+        let idx = req.session.tracks[res.locals.trackSlug].progress - 1;
+        req.session.tracks[res.locals.trackSlug].inQuestionClicks[idx]++;
+        let url = req.sanitizeQuery('link').trim();
+        return res.redirect(url);
+    });
+
     app.post('/tracks/:slug/extra', setUpTrack, function(req, res) {
-        if (req.session.hasOwnProperty('profile')) {
+        if (req.session.hasOwnProperty('profile') ||
+            req.session.hasOwnProperty('profileId')) {
             return res.redirect(`/tracks/${res.locals.trackSlug}/submit`);
         }
 
@@ -205,21 +216,27 @@ module.exports = function(app) {
     app.get('/tracks/:slug/submit', setUpTrack, function(req, res) {
         let status = req.session.tracks[res.locals.trackSlug].status;
         if (status !== 'submit') {
-            return res.redirect(`/tracks/${res.locals.trackSlug}/start`)
-        } else if (!req.session.hasOwnProperty('profile')) {
+            return res.redirect(`/tracks/${res.locals.trackSlug}/start`);
+        } else if (!req.session.hasOwnProperty('profile') &&
+            !req.session.hasOwnProperty('profileId')) {
             return res.redirect(`/tracks/${res.locals.trackSlug}/extra`);
         }
 
         let numQuestions = res.locals.currentTrack.questions.length;
         let userResponses = req.session.tracks[res.locals.trackSlug].responses;
 
-        let saveResponses = function(profile) {
+        let saveResponses = function(profileId) {
             for (let i = 0; i < numQuestions; i++) {
                 let response = {
                     answer: userResponses[i],
-                    profile: profile
+                    profile: profileId,
+                    inQuestionClicks: req.session
+                        .tracks[res.locals.trackSlug].inQuestionClicks[i],
+                    inSummaryClicks: req.session
+                        .tracks[res.locals.trackSlug].inSummaryClicks[i]
                 };
-                res.locals.currentTrack.questions[i].responses.push(response);
+                res.locals.currentTrack.questions[i].responses
+                    .push(response);
             }
             res.locals.currentTrack.save(function(err, results) {
                 if (err) {
@@ -232,26 +249,22 @@ module.exports = function(app) {
             });
         };
 
-        Profile.findOne({ user: req.sessionID }, function(err, result) {
-            if (err) {
-                req.session.tracks[res.locals.trackSlug].status = 'submit';
-                return res.redirect(`/tracks/${res.locals.trackSlug}/start`);
-            }
-            if (result) {
-                saveResponses(result._id);
-            } else {
-                let profile = new Profile(req.session.profile);
-                profile.save(function(err, profile) {
-                    if (err) {
-                        req.session.tracks[res.locals.trackSlug]
-                            .status = 'submit';
-                        return res
-                            .redirect(`/tracks/${res.locals.trackSlug}/start`);
-                    }
-                    saveResponses(profile._id);
-                });
-            }
-        });
+        if (req.session.hasOwnProperty('profileId')) {
+            saveResponses(req.session.profileId);
+        } else {
+            let profile = new Profile(req.session.profile);
+            profile.save(function(err, profile) {
+                if (err) {
+                    req.session.tracks[res.locals.trackSlug]
+                        .status = 'submit';
+                    return res
+                        .redirect(`/tracks/${res.locals.trackSlug}/start`);
+                }
+                delete req.session.profile;
+                req.session.profileId = profile._id;
+                saveResponses(profile._id);
+            });
+        }
     });
 
     app.get('/tracks/:slug/:question', setUpTrack, function(req, res) {
@@ -328,7 +341,8 @@ module.exports = function(app) {
         let userResponses = req.session.tracks[res.locals.trackSlug].responses;
         if (idx + 1 >= numQuestions) {
             // Move to extra questions if about to submit without profile
-            if (!req.session.hasOwnProperty('profile')) {
+            if (!req.session.hasOwnProperty('profile') &&
+                !req.session.hasOwnProperty('profileId')) {
                 req.session.tracks[res.locals.trackSlug].status = 'submit';
                 return res.redirect(`/tracks/${res.locals.trackSlug}/extra`);
             }
@@ -338,7 +352,11 @@ module.exports = function(app) {
                 for (let i = 0; i < numQuestions; i++) {
                     let response = {
                         answer: userResponses[i],
-                        profile: profileId
+                        profile: profileId,
+                        inQuestionClicks: req.session
+                            .tracks[res.locals.trackSlug].inQuestionClicks[i],
+                        inSummaryClicks: req.session
+                            .tracks[res.locals.trackSlug].inSummaryClicks[i]
                     };
                     res.locals.currentTrack.questions[i].responses
                         .push(response);
@@ -356,26 +374,22 @@ module.exports = function(app) {
                 });
             };
 
-            Profile.findOne({ user: req.sessionID }, function(err, result) {
-                let startURL = `/tracks/${res.locals.trackSlug}/start`;
-                if (err) {
-                    req.session.tracks[res.locals.trackSlug].status = 'submit';
-                    return res.redirect(startURL);
-                }
-                if (result) {
-                    saveResponses(result._id);
-                } else {
-                    let profile = new Profile(req.session.profile);
-                    profile.save(function(err, profile) {
-                        if (err) {
-                            req.session.tracks[res.locals.trackSlug]
-                                .status = 'submit';
-                            return res.redirect(startURL);
-                        }
-                        saveResponses(profile._id);
-                    });
-                }
-            });
+            if (req.session.hasOwnProperty('profileId')) {
+                saveResponses(req.session.profileId);
+            } else {
+                let profile = new Profile(req.session.profile);
+                profile.save(function(err, profile) {
+                    if (err) {
+                        req.session.tracks[res.locals.trackSlug]
+                            .status = 'submit';
+                        return res
+                            .redirect(`/tracks/${res.locals.trackSlug}/start`);
+                    }
+                    delete req.session.profile;
+                    req.session.profileId = profile._id;
+                    saveResponses(profile._id);
+                });
+            }
         } else {
             req.session.tracks[res.locals.trackSlug].progress++;
             return res.redirect(`/tracks/${res.locals.trackSlug}/${idx}`);

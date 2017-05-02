@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-const Profile = require('../models/profile').Profile;
 
 const questionSchema = new mongoose.Schema({
     text: String,       // Question text
@@ -7,6 +6,8 @@ const questionSchema = new mongoose.Schema({
     expected: String,   // The response (yes or no) expected for a secure user
     responses: [{
         answer: String,
+        inQuestionClicks: { type: Number, default: 0 },
+        inSummaryClicks: { type: Number, default: 0 },
         profile: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'Profile'

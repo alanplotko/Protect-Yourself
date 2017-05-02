@@ -1,10 +1,10 @@
-.ui.card > .image:not(.ui) > i, .ui.cards > .card > .image:not(.ui) > i {
-    border: none;
+.card > .image:not(.ui) > i, .cards > .card > .image:not(.ui) > i {
+  border: none;
 }
 
-.ui.card > .image > i, .ui.cards > .card > .image > i {
-    display: block;
-    width: 100%;
-    height: auto;
-    border-radius: inherit;
+.card > .image > i, .cards > .card > .image > i {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: inherit;
 }
