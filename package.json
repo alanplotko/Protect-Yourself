@@ -17,7 +17,8 @@
     "pug": "^2.0.0-beta6",
     "semantic-ui-css": "^2.2.10",
     "serve-favicon": "^2.3.0",
-    "strip-newlines": "^1.0.1"
+    "strip-newlines": "^1.0.1",
+    "uuid": "^3.0.1"
   },
   "devDependencies": {
     "chai": "^3.5.0",
