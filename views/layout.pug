@@ -3,9 +3,9 @@ html
     meta(charset='utf-8')
     meta(http-equiv='X-UA-Compatible', content='IE=edge,chrome=1')
     meta(name='viewport', content='width=device-width, initial-scale=1.0, maximum-scale=1.0')
-    link(rel="stylesheet", href="/semantic/semantic.min.css")
-    link(rel="stylesheet", href="https://fonts.googleapis.com/icon?family=Material+Icons")
-    link(rel="stylesheet", href="/assets/css/main.css")
+    link(rel='stylesheet', href='/semantic/semantic.min.css')
+    link(rel='stylesheet', href='https://fonts.googleapis.com/icon?family=Material+Icons')
+    link(rel='stylesheet', href='/assets/css/main.css')
     block styles
     title= locals.title
   body
@@ -13,17 +13,14 @@ html
       .item
         i.material-icons security
       each item in locals.navigation
-        if (locals.path == item.url || (item.url != '/' && locals.path.search(item.url) > -1))
+        if (locals.path === item.url || (item.url !== '/' && locals.path.search(item.url) > -1))
           a.active.item(href=item.url) #{item.title}
         else
           a.item(href=item.url) #{item.title}
 
-    .ui.grid
-      .row
-        .column
-          block content
+    block content
 
-    script(src="/jquery/jquery.min.js")
-    script(src="/semantic/semantic.min.js")
-    script(src="/moment/moment.min.js")
+    script(src='/jquery/jquery.min.js')
+    script(src='/semantic/semantic.min.js')
+    script(src='/moment/moment.min.js')
     block scripts

@@ -166,6 +166,8 @@ module.exports = function(app) {
         req.checkBody('gender').optional({ checkFalsy: true });
         req.checkBody('age').optional({ checkFalsy: true })
             .isInt().range(1, 200);
+        req.checkBody('education').optional({ checkFalsy: true });
+        req.checkBody('country').optional({ checkFalsy: true });
         req.checkBody('zip_code').optional({ checkFalsy: true })
             .isInt().positive().len(5);
         let error = req.validationErrors();
@@ -181,11 +183,16 @@ module.exports = function(app) {
         // Validate demographics and set up profile
         const gender = req.sanitizeBody('gender').trim();
         const age = req.sanitizeBody('age').trim();
-        const zipCode = req.sanitizeBody('zip_code').trim();
+        const education = req.sanitizeBody('education').trim();
+        const country = req.sanitizeBody('country').trim();
+        const zipCode = (country !== 'us') ? '' :
+            req.sanitizeBody('zip_code').trim();
 
         req.session.profile = {
             gender: gender,
             age: age,
+            education: education,
+            country: country,
             zipCode: zipCode
         };
 
