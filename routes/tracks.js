@@ -335,7 +335,9 @@ module.exports = function(app) {
         let track = {
             name: res.locals.trackName,
             content: res.locals.currentTrack.questions[idx].text,
-            status: req.session.tracks[res.locals.trackSlug].status
+            status: req.session.tracks[res.locals.trackSlug].status,
+            questionNo: questionNo,
+            questionTotal: res.locals.currentTrack.questions.length
         };
         let link = `/tracks/${res.locals.trackSlug}/${questionNo}`;
 

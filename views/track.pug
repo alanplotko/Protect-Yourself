@@ -10,8 +10,19 @@ block content
         .ui.raised.segments
           .ui.sizer.vertical.segment
             .ui.huge.inverted.header
-              i.info.circle.icon
-              .content= pageTitle
+              if track
+                if track.status === 'submit'
+                  i.warning.circle.icon
+                else if track.status === 'complete'
+                  i.check.circle.icon
+                else
+                  i.info.circle.icon
+              else
+                i.info.circle.icon
+              if track && track.questionNo && track.questionTotal
+                .content= `${pageTitle}: Question ${track.questionNo} / ${track.questionTotal}`
+              else
+                .content= `${pageTitle}`
           .ui.padded.segment.question
             //- If we don't receive the base link yes/no links, then we must be on the start page
             if !baseResponseLink && track

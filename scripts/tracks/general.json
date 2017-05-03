@@ -2,56 +2,80 @@
     "name" : "General",
     "slug" : "general",
     "banner" : "general-track.jpg",
-    "description" : "The General Track is the initial online checkup process available to partake in.",
-    "start" : "We'll walk you through some of the things to watch out for online. Not many people know of the extent of the information companies or online services collect. We'll show you some examples and point you in the right direction.",
-    "end" : "The checkup may be done, but you're only getting started! You need to keep an eye out for what personal information is asked of you at any time. Being cautious with your personal information can prevent situations where it cannot be entirely taken off the web. Feel free to check out some of our other tracks, especially if there's a particular topic that piques your interest.",
+    "description" : "The General Track is the initial online checkup process available.",
+    "start" : "We'll walk you through some of the things to watch out for online. Not many people know of the extent of the information companies or online services collect. There are also various cyberattacks to avoid. We'll show you some examples and point you in the right direction.",
+    "end" : "The checkup may be done, but you're only getting started! Be cautious with giving out your personal information. It is almost impossible to remove information once it reaches the web. For your next step, look over your results to see what you can do to improve.",
     "questions" : [
         {
             "text" : "The Democratic National Committee (DNC) fell victim to a cyberattack called spear phishing where fake emails were sent to over 1,000 email accounts. These emails contained malicious attachments that would enable the hackers to install malware and steal emails. Do you know how to identify malicious emails?",
             "link" : "https://support.google.com/mail/answer/8253",
             "expected" : "yes",
-            "responses" : []
+            "subject": "Spear Phishing",
+            "tag": "Identity",
+            "explanation": "It's important to know how to spot a bad email. Hackers who send out phishing emails claim a familiar identity to establish credibility and gain your trust. Phishing attacks describe scenarios that best apply to a large variety of people, whereas spear phishing attacks narrow down their audience to a few. For example, many people may use Amazon and could have an order pending shipment at any time. Given a large number of email addresses that could be obtained from breaches in online services, hackers can send out a convincing email regarding a delayed or lost shipment. This is meant to incite action from the targets, pushing them to investigate why their package won't be arriving as scheduled. In this state of confusion, they may be vulnerable to opening attachments or clicking links meant to push out malware or capture their login credentials.",
+            "responses": []
         },
         {
             "text" : "Many celebrities had their private photos leaked when hackers breached their iCloud accounts. You can better secure your accounts from hackers by using Two Factor Authentication (2FA). Even if your credentials are stolen, 2FA adds a second layer of security that prevents hackers from completing the login. Do you use 2FA to secure your accounts?",
             "link" : "https://www.cnet.com/news/two-factor-authentication-what-you-need-to-know-faq/",
             "expected" : "yes",
+            "subject": "Two Factor Authentication",
+            "tag": "Identity",
+            "explanation": "The hackers behind the breach originally exploited a bug in Find My iPhone to obtain email addresses and passwords. However, many people reuse their passwords, so they were able to get into their iCloud accounts with the same credentials. By using Two Factor Authentication, you add the requirement of a physical device, typically a smartphone, that is harder for others to get their hands on. Completing the login process, regardless of whether your credentials have been exposed, requires inputting a code texted to that device.",
             "responses" : []
         },
         {
             "text" : "About 99.3% of the smartphone market is dominated by Android and iOS devices. These devices rely on location services to collect the data needed to support the updates you receive on traffic, daily commutes, weather, and recommendations. However, not many feel comfortable having their location history throughout the day saved. Do you know how to restrict or disable location history on your personal devices?",
             "link" : "https://support.google.com/accounts/answer/3118687",
             "expected" : "yes",
+            "subject": "Location Services",
+            "tag": "Privacy",
+            "explanation": "Your location, while used to enhance your experience in certain apps, can also pose a risk to your privacy. This information is sent over the Internet constantly. If an attacker were to get access to this information, it may be possible for them to retrace your steps and locate you. Additionally, sending your location data uses additional resources that drain battery and your data plan if you are not connected to WiFi. Enabling location services is a personal choice, but many people find it more comfortable to turn it off.",
             "responses" : []
         },
         {
             "text" : "Lots of people use Facebook nowadays - there are 1.86 billion monthly active users! Facebook users post updates and share photos with their friends and family. However, depending on when you signed up, your default audience may be more than just close friends. Your posts may be visible to anyone and everyone, regardless of whether they have you as a friend or are logged in to Facebook. Do you know how to update your audience settings on Facebook?",
             "link" : "https://www.facebook.com/help/120939471321735",
             "expected" : "yes",
+            "subject": "Social Media",
+            "tag": "Privacy",
+            "explanation": "Facebook is a popular service used by billions. The content you post to Facebook is available to those you specify through the audience settings. If not updated, you could be sharing personal information with more than just your friends. Always be sure to check who you're sharing content with before posting. Once shared, it's almost impossible to remove it completely, even if removed after a few minutes.",
             "responses" : []
         },
         {
             "text" : "Amazon.com has over 300 million active customers. As a popular online retailer, Amazon must establish trust with the customer as a secure platform for making purchases. However, many online retailers do not secure their website with SSL (Secure Sockets Layer), which the browser indicates with the lock to the left of the URL. SSL encrypts information sent to and received from the website so that your transaction details, like your credit card number, are not susceptible to hackers. Do you check for the lock next to the URL in your browser when you enter personal information?",
             "link" : "https://support.google.com/chrome/answer/95617",
             "expected" : "yes",
+            "subject": "SSL (Secure Sockets Layer)",
+            "tag": "Trust",
+            "explanation": "A lot of confidential information may be sent over the Internet, from social security numbers on government sites to credit card information via online retailers. It is important to make sure that this information is being sent securely. You don't want attackers taking and using this information for malicious purposes. You can check if a site is secured by looking for the lock next to the URL in your browser. This lock signifies that the information will be encrypted prior to passing over the Internet, so that attackers can't steal your information.",
             "responses" : []
         },
         {
             "text" : "In April 2017, security experts discovered that browsers are vulnerable to homograph attacks where hackers can register domain names to pose as popular websites like apple.com. When visiting these fake look-alike websites, you may still see a lock to the left of the URL, which reinforces the website's authenticity. Do you know how to identify fake websites?",
             "link" : "https://www.xudongz.com/blog/2017/idn-phishing/",
             "expected" : "yes",
+            "subject": "Homograph Attack",
+            "tag": "Trust",
+            "explanation": "When you're sending confidential information, it's important to know whether it's going to the right place. Sometimes attackers will try to mimic popular website you'd usually trust, even in a way that would make it look secure with the lock. You can identify fake websites by checking their SSL certificate and the URL preview in the bottom left by hovering your mouse over a link.",
             "responses" : []
         },
         {
             "text" : "People tend to create passwords that are easy to remember. However, incorporating words found in a dictionary can make your password susceptible to attacks. Adding more dictionary words to your password does not make it more secure as people tend to think. Given a long password made up of dictionary words, a shorter password that does not use dictionary words can be exceptionally harder to break. Are you familiar with the rules for building a strong password?",
             "link" : "https://support.google.com/accounts/answer/32040",
             "expected" : "yes",
+            "subject": "Password Creation",
+            "tag": "Security",
+            "explanation": "Using dictionary words, even if long, will not increase the security of your password. It is important to mix symbols, letters, and numbers to make passwords harder to guess.",
             "responses" : []
         },
         {
             "text" : "People tend to reuse passwords across services. This is generally not safe because one compromised password means that your other accounts are also unsafe. The celebrities whose iCloud accounts were hacked was a result of reusing their Find My iPhone passwords for iCloud. Do you reuse your passwords across services?",
             "link" : "http://www.pcworld.com/article/2183926/apple-says-its-not-to-blame-in-idevice-ransom-attacks.html",
             "expected" : "no",
+            "subject": "Password Reuse",
+            "explanation": "Reusing passwords may seem convenient because memorizing different passwords is hard. Instead, reusing passwords puts you at greater risk of having your accounts compromised. People tend to use a lot of common services. For instance, a lot of people may use Amazon, have Facebook accounts, or use a certain bank. If your email and password is compromised, then just like with the celebrities' breached iCloud accounts, your accounts in other services could also be compromised.",
+            "tag": "Security",
             "responses" : []
         }
     ]
