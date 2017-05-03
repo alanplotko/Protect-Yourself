@@ -1,12 +1,12 @@
-const mongoose = require('../config/db').mongoose;
+const mongoose = require('mongoose');
 
 const suggestionSchema = new mongoose.Schema({
     title: String,
     description: String,
     view: String,
     disable: String,
-    timestamp: {type: Date, default: Date.now},
-    upvotes: {type: Number, default: 0},
+    timestamp: { type: Date, default: Date.now },
+    upvotes: { type: Number, default: 0 },
     tags: [String],
     author: String
 });

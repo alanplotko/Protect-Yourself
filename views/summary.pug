@@ -1,0 +1,40 @@
+extends layout
+
+block styles
+  link(rel="stylesheet", href="/assets/css/track.css")
+
+block content
+  .ui.one.column.padded.grid
+    .column
+      .ui.container
+        .ui.huge.inverted.header(style='padding-bottom: 10px;')
+          i.info.circle.icon
+          .content= `${track.name} Track: Review`
+        each question, index in track.questions
+          .ui.clearing.question.segment
+            h2.ui.header
+              if (responses[index] === question.expected)
+                i.green.check.circle.icon
+              else
+                i.red.remove.circle.icon
+              .content= `Question ${index+1}`
+                .sub.header= question.subject
+            h4.ui.horizontal.divider.header(style='margin-top: 5px;')
+              i.help.circle.icon
+              | Question Text
+            p= question.text
+            h4.ui.horizontal.divider.header(style='margin-top: 5px;')
+              i.info.circle.icon
+              | Review
+            if (responses[index] === question.expected)
+              p!= `<span style='color: green; font-weight: bold;'>You answered ${responses[index]}.</span> Good job!`
+            else
+              p!= `<span style='color: red; font-weight: bold;'>You answered ${responses[index]}.</span> ${question.explanation}`
+            a.ui.blue.right.floated.labeled.large.icon.button(href=`out?link=${question.link}&q=${index+1}&ref=summary`, target='_blank')
+                i.right.arrow.icon
+                | Learn More
+          if index + 1 < track.questions.length
+            .ui.center.aligned.container
+              i.inverted.huge.angle.down.icon
+          else
+            .ui.center.aligned.container(style='padding:20px;')

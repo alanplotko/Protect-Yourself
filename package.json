@@ -4,28 +4,44 @@
   "description": "Protect Yourself is a web application that educates users in what to watch out for before divulging personal information.",
   "main": "app/app.js",
   "dependencies": {
+    "async": "^2.3.0",
     "bluebird": "^3.4.6",
     "body-parser": "^1.15.2",
+    "connect-mongo": "^1.3.2",
     "express": "^4.14.0",
+    "express-session": "^1.15.2",
     "express-validator": "^2.21.0",
     "jquery": "^3.1.1",
     "moment": "^2.15.2",
     "mongoose": "^4.6.6",
     "pug": "^2.0.0-beta6",
-    "semantic-ui": "^2.2.6",
-    "serve-favicon": "^2.3.0"
+    "semantic-ui-css": "^2.2.10",
+    "serve-favicon": "^2.3.0",
+    "strip-newlines": "^1.0.1",
+    "uuid": "^3.0.1"
   },
   "devDependencies": {
+    "chai": "^3.5.0",
+    "chai-as-promised": "^6.0.0",
     "eslint": "^3.19.0",
     "eslint-config-google": "^0.7.1",
+    "lorem-ipsum": "^1.0.3",
     "mocha": "^3.2.0",
     "mocha-csslint": "^1.0.0",
     "mocha-eslint": "^3.0.1",
-    "nodemon": "^1.11.0"
+    "nodemon": "^1.11.0",
+    "sinon": "^2.1.0"
+  },
+  "engines": {
+    "node": "6.9.1",
+    "npm": "3.10.8"
   },
   "scripts": {
     "test": "./node_modules/.bin/mocha test",
-    "start": "./node_modules/.bin/nodemon app/app.js"
+    "start": "node app/app.js",
+    "dev": "./node_modules/.bin/nodemon app/app.js",
+    "generate_content": "node scripts/generate_content.js",
+    "clear_responses": "node scripts/clear_responses.js"
   },
   "repository": {
     "type": "git",

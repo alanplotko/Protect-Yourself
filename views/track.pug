@@ -1,0 +1,206 @@
+extends layout
+
+block styles
+  link(rel="stylesheet", href="/assets/css/track.css")
+
+block content
+  .ui.one.column.centered.grid
+    .column
+      .ui.text.container
+        .ui.raised.segments
+          .ui.sizer.vertical.segment
+            .ui.huge.inverted.header
+              if track
+                if track.status === 'submit'
+                  i.warning.circle.icon
+                else if track.status === 'complete'
+                  i.check.circle.icon
+                else
+                  i.info.circle.icon
+              else
+                i.info.circle.icon
+              if track && track.questionNo && track.questionTotal
+                .content= `${pageTitle}: Question ${track.questionNo} / ${track.questionTotal}`
+              else
+                .content= `${pageTitle}`
+          .ui.padded.segment.question
+            //- If we don't receive the base link yes/no links, then we must be on the start page
+            if !baseResponseLink && track
+              //- Show a relevant message based on their progress in the track
+              if track.status === 'submit'
+                .ui.warning.message
+                  .header Track Submission Error
+                  .
+                    There was an error just as you were wrapping up. Your responses have been saved, so hit the button below to complete the track!
+              else if track.status === 'complete'
+                .ui.positive.message
+                  .header Completed!
+                  .
+                    You've successfully completed the <strong>#{track.name} Track</strong>! Feel free to access the track materials below.
+              else if track.status === 'pending'
+                .ui.info.message
+                  .header You're almost there!
+                  .
+                    You've previously started the <strong>#{track.name} Track</strong>! Hit the button below to continue from where you left off!
+            else if extraInfo
+              .ui.info.message
+                .header Optional Information
+                p Feel free to provide additional information to contribute to our research.
+              if error
+                .ui.error.message
+                  .header There seems to be a problem
+                  ul.list
+                    for err in error
+                      li= `${locals.properCase(err.param.replace('_', ' '))}: ${err.msg}`
+              form.ui.form(method='POST')
+                .three.fields
+                  .field
+                    label Gender
+                    .ui.selection.gender.dropdown
+                      input(type='hidden', name='gender')
+                      i.dropdown.icon
+                      .default.text Gender
+                      .menu
+                        .item(data-value='male') Male
+                        .item(data-value='female') Female
+                        .item(data-value='other') Other
+                  .field
+                    label Age
+                    input(type='text', name='age', placeholder='Age')
+                  .field
+                    label Education
+                    .ui.selection.education.dropdown
+                      input(type='hidden', name='education')
+                      i.dropdown.icon
+                      .default.text Education
+                      .menu
+                        .item(data-value='prehs') Some High School
+                        .item(data-value='hs') Graduated High School
+                        .item(data-value='someuni') Some College
+                        .item(data-value='associates') Associate's Degree
+                        .item(data-value='bachelors') Bachelor's Degree
+                        .item(data-value='masters') Master's Degree
+                        .item(data-value='phd') Ph.D.
+                .two.fields
+                  include includes/country.pug
+                  .field.zipCode
+                    label Zip Code
+                    input(type='text', name='zip_code', placeholder='Zip Code')
+                .ui.error.message
+                .ui.primary.right.labeled.icon.submit.button
+                  i.right.arrow.icon
+                  .
+                    Continue
+
+
+            if track
+              p= track.content
+
+          .ui.secondary.clearing.segment
+            //- If we receive a link to learn more, display the learn more button on the left
+            if learnMoreBtnLink
+              a.ui.blue.right.labeled.icon.button(href=`out?link=${learnMoreBtnLink}&ref=question`, target='_blank')
+                i.right.arrow.icon
+                .
+                  Learn More
+            if extraInfo
+              i.right.info.icon
+              .
+                You are not required to fill out any of the above fields to proceed.
+            else
+              .ui.right.floated.buttons
+                //- If we have a base response link, then we can generate the yes/no buttons
+                if baseResponseLink
+                  a.ui.blue.button(href=`${baseResponseLink}/yes`) Yes
+                  .or
+                  a.ui.blue.button(href=`${baseResponseLink}/no`) No
+                //- Otherwise, if there's no base response link, we're showing a single action button
+                else
+                  a.ui.right.labeled.icon.button(href=actionBtnLink)
+                    i.right.arrow.icon
+                    .
+                      #{actionBtnLabel}
+
+block scripts
+  if extraInfo
+    script(type='text/javascript').
+      $(document).ready(function() {
+        $('.ui.form').form({
+          fields: {
+            gender: {
+              identifier: 'gender',
+              optional: true
+            },
+            age: {
+              identifier: 'age',
+              optional: true,
+              rules: [{
+                type: 'integer[1..200]',
+                prompt: 'Age must be a valid positive integer.'
+              }]
+            },
+            education: {
+              identifier: 'education',
+              optional: true
+            },
+            country: {
+              identifier: 'country',
+              optional: true
+            },
+            zip_code: {
+              identifier : 'zip_code',
+              optional: true,
+              rules: [{
+                type: 'integer',
+                prompt: 'Zip code must be numerical.'
+              }, {
+                type: 'exactLength[5]',
+                prompt: 'Zip code must be five digits.'
+              }]
+            },
+          }
+        });
+        let clearableField = function(targetObj) {
+          var target = $(targetObj);
+          return function(value) {
+            if (value) {
+              target.find('.dropdown.icon').removeClass('dropdown').addClass('delete').on('click', function() {
+                target.dropdown('clear');
+                $(this).removeClass('delete').addClass('dropdown');
+              });
+            }
+          };
+        };
+
+        let countryClearableField = function(targetObj) {
+          var target = $(targetObj);
+          return function(value) {
+            if (value) {
+              target.find('.dropdown.icon').removeClass('dropdown').addClass('delete').on('click', function() {
+                target.dropdown('clear');
+                $(this).removeClass('delete').addClass('dropdown');
+              });
+              if ($(target).find('input').val() === 'us') {
+                $('.field.zipCode').removeClass('disabled');
+              } else {
+                $('.field.zipCode').addClass('disabled');
+              }
+            }
+          };
+        };
+
+        $('.ui.selection.gender.dropdown').dropdown({
+          onChange: clearableField('.ui.selection.gender.dropdown')
+        });
+        $('.ui.selection.education.dropdown').dropdown({
+          onChange: clearableField('.ui.selection.education.dropdown')
+        });
+        $('.ui.selection.country.dropdown').dropdown({
+          onChange: countryClearableField('.ui.selection.country.dropdown')
+        });
+        let countryField = $('.ui.selection.country.dropdown');
+        countryField.find('.dropdown.icon').removeClass('dropdown').addClass('delete').on('click', function() {
+          countryField.dropdown('clear');
+          $(this).removeClass('delete').addClass('dropdown');
+        });
+      });

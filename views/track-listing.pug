@@ -1,0 +1,47 @@
+extends layout
+
+block styles
+  link(rel='stylesheet', href='/assets/css/track-listing.css')
+
+block content
+  .ui.padded.grid
+    .one.wide.column
+    .fourteen.wide.column
+      .ui.three.doubling.stackable.cards
+        for track in tracks
+          .card
+            a(href=`/tracks/${track.slug}/start`).image
+              img(src=`/assets/img/${track.banner}`)
+            .content
+              a.header(href=`/tracks/${track.slug}/start`)= `${track.name} Track`
+              .description= track.description
+            .extra.content
+              if track.percentage === 0
+                span.right.floated Not Started
+              else if track.percentage === 100 && track.status && track.status === 'submit'
+                span.right.floated Must Resubmit
+              else
+                span.right.floated= `${track.percentage}% done`
+              span
+                i.help.icon
+                | #{track.questions} questions
+        .card
+          .image
+            i.betaIcon.bordered.inverted.blue.huge.checked.calendar.icon
+          .content
+            .header Beta
+            .description Only the General Track is available in the beta. Stay tuned for future updates!
+    .one.wide.column
+
+block scripts
+  script(type='text/javascript').
+    function resizeIcon() {
+      $('div.image').height($('a.image').height());
+      $('i.betaIcon').css({ 'font-size': ($('div.image').height() / 2) + 'px'});
+    }
+
+    resizeIcon();
+
+    $(window).resize(function() {
+      resizeIcon();
+    });
