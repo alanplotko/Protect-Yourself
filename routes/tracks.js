@@ -27,7 +27,7 @@ let setUpTrack = function(req, res, next) {
                 status: 'start',
                 responses: [],
                 inQuestionClicks: Array(numQuestions).fill(0),
-                inSummaryClicks: Array(numQuestions).fill(0)
+                inSummaryClickIds: Array(numQuestions).fill(0)
             };
         }
 
@@ -182,18 +182,20 @@ module.exports = function(app) {
 
             idx = parseInt(req.sanitizeQuery('q').trim()) - 1;
             if (idx >= req.session.tracks[res.locals.trackSlug]
-                .inSummaryClicks.length) {
+                .inSummaryClickIds.length) {
                 return res.render('error');
             }
 
+            let findQuery = {};
+            findQuery['slug'] = res.locals.trackSlug;
+            findQuery[`questions.${idx}.responses._id`] =
+                ObjectID(req.session.tracks[res.locals.trackSlug]
+                .inSummaryClickIds[idx]);
             let updateQuery = {}, nestedQuery = {};
             nestedQuery[`questions.${idx}.responses.$.inSummaryClicks`] = 1;
             updateQuery['$inc'] = nestedQuery;
 
-            Track.findOneAndUpdate({
-                'slug': res.locals.trackSlug,
-                'questions.responses.profile': req.session.profileId
-            }, updateQuery, function(err, track) {
+            Track.update(findQuery, updateQuery, function(err, track) {
                 if (err || track == null) {
                     return res.render('error');
                 }
@@ -265,17 +267,18 @@ module.exports = function(app) {
         let saveResponses = function(profileId) {
             for (let i = 0; i < numQuestions; i++) {
                 let response = {
+                    _id: ObjectID(),
                     answer: userResponses[i],
                     profile: profileId,
                     inQuestionClicks: req.session
                         .tracks[res.locals.trackSlug].inQuestionClicks[i],
-                    inSummaryClicks: req.session
-                        .tracks[res.locals.trackSlug].inSummaryClicks[i]
+                    inSummaryClicks: 0
                 };
-                res.locals.currentTrack.questions[i].responses
-                    .push(response);
+                req.session.tracks[res.locals.trackSlug].inSummaryClickIds[i] =
+                    response._id;
+                res.locals.currentTrack.questions[i].responses.push(response);
             }
-            res.locals.currentTrack.save(function(err, results) {
+            res.locals.currentTrack.save(function(err, result) {
                 if (err) {
                     return res.redirect(
                         `/tracks/${res.locals.trackSlug}/start`
