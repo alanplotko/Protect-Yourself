@@ -21,5 +21,5 @@ block content
               td= question.text
               td.center.aligned(style='font-weight: bold;')= locals.properCase(responses[index])
               td.center.aligned
-                a.ui.blue.icon.button(href=question.link, target='_blank')
+                a.ui.blue.icon.button(href=`out?link=${question.link}&q=${index+1}&ref=summary`, target='_blank')
                   i.info.icon

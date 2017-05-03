@@ -1,5 +1,6 @@
 const Track = require('../models/track').Track;
 const Profile = require('../models/profile').Profile;
+const ObjectID = require('mongoose').mongo.ObjectID;
 
 let setUpTrack = function(req, res, next) {
     // Handle errors for track slug
@@ -162,9 +163,45 @@ module.exports = function(app) {
 
     app.get('/tracks/:slug/out', setUpTrack, function(req, res) {
         let idx = req.session.tracks[res.locals.trackSlug].progress - 1;
-        req.session.tracks[res.locals.trackSlug].inQuestionClicks[idx]++;
+        req.checkQuery('link').notEmpty();
+        req.checkQuery('ref').notEmpty();
+        let error = req.validationErrors();
+        if (error) return res.render('error');
+
         let url = req.sanitizeQuery('link').trim();
-        return res.redirect(url);
+        let ref = req.sanitizeQuery('ref').trim()
+
+        if (ref === 'question' &&
+            req.session.tracks[res.locals.trackSlug].status !== 'complete') {
+            req.session.tracks[res.locals.trackSlug].inQuestionClicks[idx]++;
+            return res.redirect(url);
+        } else if (ref === 'summary') {
+            req.checkQuery('q').notEmpty().isInt();
+            error = req.validationErrors();
+            if (error) return res.render('error');
+
+            idx = parseInt(req.sanitizeQuery('q').trim()) - 1;
+            if (idx >= req.session.tracks[res.locals.trackSlug]
+                .inSummaryClicks.length) {
+                return res.render('error');
+            }
+
+            let updateQuery = {}, nestedQuery = {};
+            nestedQuery[`questions.${idx}.responses.$.inSummaryClicks`] = 1;
+            updateQuery['$inc'] = nestedQuery;
+
+            Track.findOneAndUpdate({
+                'slug': res.locals.trackSlug,
+                'questions.responses.profile': req.session.profileId
+            }, updateQuery, function(err, track) {
+                if (err || track == null) {
+                    return res.render('error');
+                }
+                return res.redirect(url);
+            });
+        } else {
+            return res.render('error');
+        }
     });
 
     app.post('/tracks/:slug/extra', setUpTrack, function(req, res) {
