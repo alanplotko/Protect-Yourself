@@ -1,0 +1,128 @@
+extends layout
+
+block content
+  .ui.padded.grid
+    .one.wide.column
+    .fourteen.wide.column
+      .ui.huge.header.padded.inverted= `${trackName} Track: Dashboard`
+      .ui.container.center.aligned
+        .ui.horizontal.divider.inverted.header
+          i.bar.chart.circle.icon
+          | General Statistics
+        .ui.six.centered.doubling.stackable.cards
+          .card
+            .content
+              .ui.statistic
+                .value= numUsers
+                .label Users
+          .card
+            .content
+              .ui.statistic
+                .value= numProfiles
+                .label Profiles
+          .card
+            .content
+              .ui.statistic
+                .value= numCompleted
+                .label Completed
+          .card
+            .content
+              .ui.statistic
+                .value= numStarted
+                .label Just Started
+          .card
+            .content
+              .ui.statistic
+                .value= numPending
+                .label Almost done
+          .card
+            .content
+              .ui.statistic
+                .value= numResubmit
+                .label Need to resubmit
+        .ui.one.centered.doubling.stackable.cards
+          .card
+            .content
+              .ui.four.statistics
+                .statistic
+                  .value
+                    i.man.icon
+                    span!= `&nbsp;${gender['male']}`
+                  .label Male
+                .statistic
+                  .value
+                    i.woman.icon
+                    span!= `&nbsp;${gender['female']}`
+                  .label Female
+                .statistic
+                  .value
+                    i.other.gender.icon
+                    span!= `&nbsp;${gender['other']}`
+                  .label Other
+                .statistic
+                  .value
+                    i.help.icon
+                    span!= `&nbsp;${gender['unprovided']}`
+                  .label Unprovided
+          .card
+            .content
+              .ui.four.statistics
+                .statistic
+                  .value!= `&nbsp;${education['prehs']}`
+                  .label Some High School
+                .statistic
+                  .value!= `&nbsp;${education['hs']}`
+                  .label Graduated High School
+                .statistic
+                  .value!= `&nbsp;${education['someuni']}`
+                  .label Some College
+                .statistic
+                  .value!= `&nbsp;${education['associates']}`
+                  .label Associate's Degree
+                .statistic
+                  .value!= `&nbsp;${education['bachelors']}`
+                  .label Bachelor's Degree
+                .statistic
+                  .value!= `&nbsp;${education['masters']}`
+                  .label Master's Degree
+                .statistic
+                  .value!= `&nbsp;${education['phd']}`
+                  .label Ph.D.
+                .statistic
+                  .value!= `&nbsp;${education['unprovided']}`
+                  .label Unprovided
+          .card
+            .content
+              .ui.three.statistics
+                .statistic
+                  .value!= `&nbsp;${age['lte']}`
+                  .label= '<= 26 years old'
+                .statistic
+                  .value!= `&nbsp;${age['gt']}`
+                  .label= '> 26 years old'
+                .statistic
+                  .value!= `&nbsp;${age['unprovided']}`
+                  .label Unprovided
+        .ui.horizontal.divider.inverted.header
+          i.question.circle.icon
+          | Questions
+        .ui.four.centered.doubling.stackable.cards
+          for question, index in questions
+            a.card(href=`/tracks/${trackSlug}/dashboard/${index + 1}`)
+              .content
+                h2.ui.header= `Question ${index + 1}`
+                if question.expected === 'yes'
+                  .ui.green.statistic
+                    .value= yeses[index]
+                    .label Secure
+                  .ui.red.statistic
+                    .value= numCompleted - yeses[index]
+                    .label Not Secure
+                else
+                  .ui.green.statistic
+                    .value= numCompleted - yeses[index]
+                    .label Secure
+                  .ui.red.statistic
+                    .value= yeses[index]
+                    .label Not Secure
+    .one.wide.column

@@ -11,6 +11,7 @@
     "express": "^4.14.0",
     "express-session": "^1.15.2",
     "express-validator": "^2.21.0",
+    "jStat": "^1.5.3",
     "jquery": "^3.1.1",
     "moment": "^2.15.2",
     "mongoose": "^4.6.6",
@@ -41,6 +42,7 @@
     "start": "node app/app.js",
     "dev": "./node_modules/.bin/nodemon app/app.js",
     "generate_content": "node scripts/generate_content.js",
+    "build_content": "node scripts/build_content.js",
     "clear_responses": "node scripts/clear_responses.js"
   },
   "repository": {

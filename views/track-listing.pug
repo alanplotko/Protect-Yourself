@@ -14,14 +14,19 @@ block content
               img(src=`/assets/img/${track.banner}`)
             .content
               a.header(href=`/tracks/${track.slug}/start`)= `${track.name} Track`
+              .meta
+                if track.percentage === 0
+                  span Status: Not Started
+                else if track.percentage === 100 && track.status && track.status === 'submit'
+                  span Status: Must Resubmit
+                else
+                  span= `Status: ${track.percentage}% done`
               .description= track.description
             .extra.content
-              if track.percentage === 0
-                span.right.floated Not Started
-              else if track.percentage === 100 && track.status && track.status === 'submit'
-                span.right.floated Must Resubmit
-              else
-                span.right.floated= `${track.percentage}% done`
+              span.right.floated
+                a(href=`/tracks/${track.slug}/dashboard`)
+                  i.bar.chart.link.icon
+                  | Dashboard
               span
                 i.help.icon
                 | #{track.questions} questions

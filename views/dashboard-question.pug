@@ -1,0 +1,21 @@
+extends layout
+
+block styles
+  link(rel='stylesheet', href='/assets/css/track.css')
+
+block content
+  .ui.padded.grid
+    .one.wide.column
+    .fourteen.wide.column
+      .ui.huge.header.padded.inverted= `${trackName} Track: Dashboard | #${questionNumber}`
+      .ui.container.center.aligned
+        .ui.horizontal.divider.inverted.header
+          i.file.text.icon
+          | Question Text
+        .ui.question.segment.left.aligned
+          p= questionText
+        .ui.horizontal.divider.inverted.header
+          i.bar.chart.icon
+          | General Statistics
+        .ui.one.centered.doubling.stackable.cards
+    .one.wide.column

@@ -1,6 +1,9 @@
 const Track = require('../models/track').Track;
 const Profile = require('../models/profile').Profile;
 const ObjectID = require('mongoose').mongo.ObjectID;
+const mongoose = require('mongoose');
+const async = require('async');
+const jStat = require('jStat').jStat;
 
 let setUpTrack = function(req, res, next) {
     // Handle errors for track slug
@@ -38,7 +41,107 @@ let setUpTrack = function(req, res, next) {
     });
 };
 
+let analyzeTrack = function(req, res, next) {
+    // Handle errors for track slug
+    req.checkParams('slug').notEmpty();
+    let error = req.validationErrors();
+    if (error) return res.redirect('/');
+
+    // Validate session and set up track
+    let slug = req.sanitizeParams('slug').trim();
+    if (!req.session.hasOwnProperty('tracks')) {
+        req.session.tracks = {};
+    }
+
+    Track.findOne({ 'slug': slug }).populate('questions.responses.profile')
+        .exec(function(err, track) {
+            // Redirect failed or unknown requests back to home
+            if (err || track == null) {
+                return res.redirect('/');
+            }
+
+            res.locals.trackName = track.name;
+            res.locals.trackSlug = slug;
+            res.locals.currentTrack = track;
+            next();
+        });
+}
+
+const calcStdErr = function(a1, a2) {
+    let s1 = jStat.variance(a1, true),
+        s2 = jStat.variance(a2, true);
+    return Math.sqrt((s1 / a1.length) + (s2 / a2.length));
+};
+
+const calcZScore = function(meanA1, meanA2, StdErr) {
+    return (meanA1 - meanA2) / StdErr;
+};
+
+const calcPValue = function(zScore) {
+    return jStat.ztest(zScore, 1);
+};
+
 module.exports = function(app) {
+    app.get('/analyze/:slug', analyzeTrack, function(req, res) {
+        let tasks = [];
+
+        let calcStats = function() {
+            return function(callback) {
+                let qs = res.locals.currentTrack.questions;
+                let secureLte26 = [], secureGt26 = [];
+                let numQuestions = qs.length,
+                    numProfiles = qs[0].responses.length;
+                let i = 0, j = 0;
+                for (i = 0; i < numProfiles; i++) {
+                    let score = 0;
+                    let age = qs[0].responses[i].profile.age;
+                    if (age === null) continue;
+                    for (j = 0; j < numQuestions; j++) {
+                        if (qs[j].responses[i].answer === qs[j].expected) {
+                            score++;
+                        }
+                    }
+                    if (age > 26) {
+                        secureGt26.push(score);
+                    } else {
+                        secureLte26.push(score);
+                    }
+                }
+
+                let meanA1 = jStat.mean(secureLte26),
+                    meanA2 = jStat.mean(secureGt26),
+                    stdErr = calcStdErr(secureLte26, secureGt26),
+                    zScore = calcZScore(meanA1, meanA2, stdErr),
+                    pValue = calcPValue(zScore);
+
+                callback(null, {
+                    '26 and under': {
+                        'Secure avg': meanA1,
+                        'Score array': JSON.stringify(secureLte26),
+                        'Total': secureLte26.length
+                    },
+                    'Over 26': {
+                        'Secure avg': meanA2,
+                        'Score array': JSON.stringify(secureGt26),
+                        'Total': secureGt26.length
+                    },
+                    'Std err': stdErr,
+                    'Z score': zScore,
+                    'P value': pValue
+                });
+            };
+        };
+
+        tasks.push(calcStats());
+
+        // Organize results and send to console
+        async.parallel(tasks, function(err, results) {
+            if (err) return res.render('error');
+            console.log(results);
+            return res.render('index');
+        });
+    });
+
     app.get('/tracks', function(req, res) {
         // Set up tracks in session
         if (!req.session.hasOwnProperty('tracks')) {
@@ -74,6 +177,157 @@ module.exports = function(app) {
                 error: err
             });
         });
+    });
+
+    app.get('/tracks/:slug/dashboard', analyzeTrack, function(req, res) {
+        let tasks = [];
+
+        let countRecords = function(collectionName) {
+            return function(callback) {
+                mongoose.connection.collection(collectionName)
+                    .find().count(function(err, count) {
+                        callback(err, count);
+                    });
+            };
+        };
+
+        let countYeses = function() {
+            return function(callback) {
+                let questions = res.locals.currentTrack.questions;
+                let yeses = [];
+                for (let i = 0; i < questions.length; i++) {
+                    let count = 0;
+                    for (let j = 0; j < questions[i].responses.length; j++) {
+                        if (questions[i].responses[j].answer === 'yes') {
+                            count++;
+                        }
+                    }
+                    yeses.push(count);
+                }
+                callback(null, yeses);
+            };
+        };
+
+        let countStatus = function(status) {
+            return function(callback) {
+                mongoose.connection.collection('sessions')
+                    .find({
+                        'session': {
+                            '$regex': new RegExp('.*' + status + '.*')
+                        }
+                    })
+                    .count(function(err, count) {
+                        callback(err, count);
+                    });
+            };
+        };
+
+        let countProfile = function(query) {
+            return function(callback) {
+                Profile.find(query).count(function(err, result) {
+                    callback(err, result);
+                });
+            };
+        };
+
+        tasks.push(countRecords('sessions'));
+        tasks.push(countRecords('profiles'));
+        tasks.push(countYeses());
+
+        tasks.push(countStatus('start'));
+        tasks.push(countStatus('pending'));
+        tasks.push(countStatus('resubmit'));
+        tasks.push(countStatus('complete'));
+
+        tasks.push(countProfile({ 'gender': 'male' }));
+        tasks.push(countProfile({ 'gender': 'female' }));
+        tasks.push(countProfile({ 'gender': 'other' }));
+        tasks.push(countProfile({ 'gender': '' }));
+        tasks.push(countProfile({ 'education': 'prehs' }));
+        tasks.push(countProfile({ 'education': 'hs' }));
+        tasks.push(countProfile({ 'education': 'someuni' }));
+        tasks.push(countProfile({ 'education': 'associates' }));
+        tasks.push(countProfile({ 'education': 'bachelors' }));
+        tasks.push(countProfile({ 'education': 'masters' }));
+        tasks.push(countProfile({ 'education': 'phd' }));
+        tasks.push(countProfile({ 'education': '' }));
+        tasks.push(countProfile({ 'age': { '$gt': 26 } }));
+        tasks.push(countProfile({ 'age': { '$lte': 26 } }));
+        tasks.push(countProfile({ 'age': null }));
+
+        // Organize results and send to dashboard view
+        async.parallel(tasks, function(err, results) {
+            if (err) return res.render('error');
+            return res.render('dashboard', {
+                trackName: res.locals.currentTrack.name,
+                trackSlug: res.locals.trackSlug,
+                numUsers: results[0],
+                numProfiles: results[1],
+                questions: res.locals.currentTrack.questions,
+                yeses: results[2],
+                numStarted: results[3],
+                numPending: results[4],
+                numResubmit: results[5],
+                numCompleted: results[6],
+                gender: {
+                    male: results[7],
+                    female: results[8],
+                    other: results[9],
+                    unprovided: results[10]
+                },
+                education: {
+                    prehs: results[11],
+                    hs: results[12],
+                    someuni: results[13],
+                    associates: results[14],
+                    bachelors: results[15],
+                    masters: results[16],
+                    phd: results[17],
+                    unprovided: results[18]
+                },
+                age: {
+                    gt: results[19],
+                    lte: results[20],
+                    unprovided: results[21]
+                }
+            });
+        });
+    });
+
+    app.get('/tracks/:slug/dashboard/:question', analyzeTrack,
+        function(req, res) {
+            // Handle errors for question number
+            req.checkParams('question').notEmpty().isInt();
+            let error = req.validationErrors();
+            if (error) {
+                return res.redirect(
+                    `/tracks/${res.locals.trackSlug}/dashboard`
+                );
+            }
+            // Validate question number
+            let questionNo = parseInt(req.sanitizeParams('question'));
+            let idx = questionNo - 1;
+            if (idx >= res.locals.currentTrack.questions.length || idx < 0) {
+                return res.redirect(
+                    `/tracks/${res.locals.trackSlug}/dashboard`
+                );
+            }
+
+            let tasks = [];
+
+            // Organize results and send to dashboard-question view
+            async.parallel(tasks, function(err, results) {
+                if (err) return res.render('error');
+
+                let lte26 = results[0], gt26 = results[1];
+
+                return res.render('dashboard-question', {
+                    trackName: res.locals.currentTrack.name,
+                    trackSlug: res.locals.trackSlug,
+                    questionNumber: questionNo,
+                    questionText: res.locals.currentTrack.questions[idx].text
+                });
+            });
     });
 
     app.get('/tracks/:slug/start', setUpTrack, function(req, res) {
