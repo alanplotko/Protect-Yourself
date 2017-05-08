@@ -16,6 +16,7 @@ app.use('/public', express.static(dir + '/public/'));
 app.use('/semantic', express.static(dir + '/node_modules/semantic-ui-css/'));
 app.use('/jquery', express.static(dir + '/node_modules/jquery/dist/'));
 app.use('/moment', express.static(dir + '/node_modules/moment/min/'));
+app.use('/charts', express.static(dir + '/node_modules/chart.js/dist/'));
 app.use('/assets', express.static(dir + '/assets/'));
 app.use(function(req, res, next) {
     let pathStr = req.path;

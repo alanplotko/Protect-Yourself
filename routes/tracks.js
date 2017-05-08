@@ -77,71 +77,180 @@ const calcZScore = function(meanA1, meanA2, StdErr) {
     return (meanA1 - meanA2) / StdErr;
 };
 
-const calcPValue = function(zScore) {
-    return jStat.ztest(zScore, 1);
+const calcPValue = function(zScore, tails) {
+    return jStat.ztest(zScore, tails);
 };
 
-module.exports = function(app) {
-    app.get('/analyze/:slug', analyzeTrack, function(req, res) {
-        let tasks = [];
+const countRecords = function(collectionName) {
+    return function(callback) {
+        mongoose.connection.collection(collectionName)
+            .find().count(function(err, count) {
+                callback(err, count);
+            });
+    };
+};
 
-        let calcStats = function() {
-            return function(callback) {
-                let qs = res.locals.currentTrack.questions;
-                let secureLte26 = [], secureGt26 = [];
-                let numQuestions = qs.length,
-                    numProfiles = qs[0].responses.length;
-                let i = 0, j = 0;
-                for (i = 0; i < numProfiles; i++) {
-                    let score = 0;
-                    let age = qs[0].responses[i].profile.age;
-                    if (age === null) continue;
-                    for (j = 0; j < numQuestions; j++) {
-                        if (qs[j].responses[i].answer === qs[j].expected) {
-                            score++;
-                        }
-                    }
-                    if (age > 26) {
-                        secureGt26.push(score);
-                    } else {
-                        secureLte26.push(score);
-                    }
+const countYeses = function(questions) {
+    return function(callback) {
+        let yeses = [];
+        for (let i = 0; i < questions.length; i++) {
+            let count = 0;
+            for (let j = 0; j < questions[i].responses.length; j++) {
+                if (questions[i].responses[j].answer === 'yes') {
+                    count++;
                 }
+            }
+            yeses.push(count);
+        }
+        callback(null, yeses);
+    };
+};
 
-                let meanA1 = jStat.mean(secureLte26),
-                    meanA2 = jStat.mean(secureGt26),
-                    stdErr = calcStdErr(secureLte26, secureGt26),
-                    zScore = calcZScore(meanA1, meanA2, stdErr),
-                    pValue = calcPValue(zScore);
+const countStatus = function(status) {
+    return function(callback) {
+        mongoose.connection.collection('sessions')
+            .find({
+                'session': {
+                    '$regex': new RegExp('.*' + status + '.*')
+                }
+            })
+            .count(function(err, count) {
+                callback(err, count);
+            });
+    };
+};
 
-                callback(null, {
-                    '26 and under': {
-                        'Secure avg': meanA1,
-                        'Score array': JSON.stringify(secureLte26),
-                        'Total': secureLte26.length
-                    },
-                    'Over 26': {
-                        'Secure avg': meanA2,
-                        'Score array': JSON.stringify(secureGt26),
-                        'Total': secureGt26.length
-                    },
-                    'Std err': stdErr,
-                    'Z score': zScore,
-                    'P value': pValue
-                });
-            };
-        };
-
-        tasks.push(calcStats());
-
-        // Organize results and send to console
-        async.parallel(tasks, function(err, results) {
-            if (err) return res.render('error');
-            console.log(results);
-            return res.render('index');
+const countProfile = function(query) {
+    return function(callback) {
+        Profile.find(query).count(function(err, result) {
+            callback(err, result);
         });
-    });
+    };
+};
 
+const checkEq = function(k, v) { return k === v; }
+const checkLte = function(k, v) { return k <= v; }
+const checkGt = function(k, v) { return k > v; }
+const countSecureMatches = function(question, key, value, cmpFunc) {
+    return function(callback) {
+        let responses = question.responses;
+        let count = 0;
+        for (let i = 0; i < responses.length; i++) {
+            if (question.expected === responses[i].answer &&
+                cmpFunc(responses[i].profile[key], value)) {
+                count++;
+            }
+        }
+        callback(null, count);
+    };
+};
+
+let calcStatsByAge = function(qs) {
+    let secureLte26 = [], secureGt26 = [];
+    let numQuestions = qs.length,
+        numProfiles = qs[0].responses.length;
+    let i = 0, j = 0;
+    for (i = 0; i < numProfiles; i++) {
+        let score = 0;
+        let age = qs[0].responses[i].profile.age;
+        if (age === null) continue;
+        for (j = 0; j < numQuestions; j++) {
+            if (qs[j].responses[i].answer === qs[j].expected) {
+                score++;
+            }
+        }
+        if (age > 26) {
+            secureGt26.push(score);
+        } else {
+            secureLte26.push(score);
+        }
+    }
+
+    let meanA1 = jStat.mean(secureLte26),
+        meanA2 = jStat.mean(secureGt26),
+        stdErr = calcStdErr(secureLte26, secureGt26),
+        zScore = calcZScore(meanA1, meanA2, stdErr),
+        pValue = calcPValue(zScore, 1);
+
+    return [
+        // Over 26
+        {
+            'mean': meanA2,
+            'size': secureGt26.length,
+            'variance': jStat.variance(secureGt26, true)
+        },
+        // 26 and under
+        {
+            'mean': meanA1,
+            'size': secureLte26.length,
+            'variance': jStat.variance(secureLte26, true)
+        },
+        // Other stats
+        {
+            'stderr': stdErr,
+            'zscore': zScore,
+            'pvalue': pValue
+        }
+    ];
+}
+
+let calcStatsByEdu = function(qs) {
+    let secureLtB = [], secureGteB = [];
+    let numQuestions = qs.length,
+        numProfiles = qs[0].responses.length;
+    let i = 0, j = 0;
+    for (i = 0; i < numProfiles; i++) {
+        let score = 0;
+        let education = qs[0].responses[i].profile.education;
+        if (education === '') continue;
+        for (j = 0; j < numQuestions; j++) {
+            if (qs[j].responses[i].answer === qs[j].expected) {
+                score++;
+            }
+        }
+        switch (education) {
+            case 'prehs':
+            case 'hs':
+            case 'someuni':
+                secureLtB.push(score);
+                break;
+            case 'bachelors':
+            case 'masters':
+            case 'phd':
+                secureGteB.push(score);
+                break;
+        }
+    }
+
+    let meanA1 = jStat.mean(secureLtB),
+        meanA2 = jStat.mean(secureGteB),
+        stdErr = calcStdErr(secureLtB, secureGteB),
+        zScore = calcZScore(meanA1, meanA2, stdErr),
+        pValue = calcPValue(zScore, 2);
+
+    return [
+        // Before Bachelor's
+        {
+            'mean': meanA1,
+            'size': secureLtB.length,
+            'variance': jStat.variance(secureLtB, true)
+        },
+        // At least Bachelor's
+        {
+            'mean': meanA2,
+            'size': secureGteB.length,
+            'variance': jStat.variance(secureGteB, true)
+        },
+        // Other stats
+        {
+            'stderr': stdErr,
+            'zscore': zScore,
+            'pvalue': pValue
+        }
+    ];
+}
+
+module.exports = function(app) {
     app.get('/tracks', function(req, res) {
         // Set up tracks in session
         if (!req.session.hasOwnProperty('tracks')) {
@@ -182,57 +291,9 @@ module.exports = function(app) {
     app.get('/tracks/:slug/dashboard', analyzeTrack, function(req, res) {
         let tasks = [];
 
-        let countRecords = function(collectionName) {
-            return function(callback) {
-                mongoose.connection.collection(collectionName)
-                    .find().count(function(err, count) {
-                        callback(err, count);
-                    });
-            };
-        };
-
-        let countYeses = function() {
-            return function(callback) {
-                let questions = res.locals.currentTrack.questions;
-                let yeses = [];
-                for (let i = 0; i < questions.length; i++) {
-                    let count = 0;
-                    for (let j = 0; j < questions[i].responses.length; j++) {
-                        if (questions[i].responses[j].answer === 'yes') {
-                            count++;
-                        }
-                    }
-                    yeses.push(count);
-                }
-                callback(null, yeses);
-            };
-        };
-
-        let countStatus = function(status) {
-            return function(callback) {
-                mongoose.connection.collection('sessions')
-                    .find({
-                        'session': {
-                            '$regex': new RegExp('.*' + status + '.*')
-                        }
-                    })
-                    .count(function(err, count) {
-                        callback(err, count);
-                    });
-            };
-        };
-
-        let countProfile = function(query) {
-            return function(callback) {
-                Profile.find(query).count(function(err, result) {
-                    callback(err, result);
-                });
-            };
-        };
-
         tasks.push(countRecords('sessions'));
         tasks.push(countRecords('profiles'));
-        tasks.push(countYeses());
+        tasks.push(countYeses(res.locals.currentTrack.questions));
 
         tasks.push(countStatus('start'));
         tasks.push(countStatus('pending'));
@@ -250,7 +311,6 @@ module.exports = function(app) {
         tasks.push(countProfile({ 'education': 'bachelors' }));
         tasks.push(countProfile({ 'education': 'masters' }));
         tasks.push(countProfile({ 'education': 'phd' }));
-        tasks.push(countProfile({ 'education': '' }));
         tasks.push(countProfile({ 'age': { '$gt': 26 } }));
         tasks.push(countProfile({ 'age': { '$lte': 26 } }));
         tasks.push(countProfile({ 'age': null }));
@@ -258,6 +318,64 @@ module.exports = function(app) {
         // Organize results and send to dashboard view
         async.parallel(tasks, function(err, results) {
             if (err) return res.render('error');
+
+            let genderData = [], educationData = [], ageData = [];
+            for (let i = 7; i <= 10; i++) genderData.push(results[i]);
+            for (let i = 11; i <= 17; i++) educationData.push(results[i]);
+            for (let i = 18; i <= 20; i++) ageData.push(results[i]);
+
+            const genderChartOptions = {
+                type: 'pie',
+                data: {
+                    labels: ['Male', 'Female', 'Other', 'Unprovided'],
+                    datasets: [{
+                        data: genderData,
+                        backgroundColor: ['#551A8B', '#008000', '#A52A2A',
+                            '#E5E5E5'],
+                        hoverBackgroundColor: ['#551A8B', '#008000', '#A52A2A',
+                            '#E5E5E5']
+                    }]
+                }
+            };
+
+            const educationChartOptions = {
+                type: 'bar',
+                data: {
+                    labels: ['Some High School', 'Graduated High School',
+                        'Some College', 'Associate\'s Degree',
+                        'Bachelor\'s Degree', 'Master\'s Degree', 'Ph.D.'],
+                    datasets: [{
+                        label: '# of Users',
+                        data: educationData,
+                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 1,
+                        hoverBackgroundColor: 'rgba(255, 99, 132, 0.2)',
+                        hoverBorderColor: 'rgba(255, 99, 132, 1)',
+                        hoverBorderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        yAxes: [{
+                            ticks: { beginAtZero:true }
+                        }]
+                    }
+                }
+            };
+
+            const ageChartOptions = {
+                type: 'pie',
+                data: {
+                    labels: ['Over 26', '26 and Under', 'Unprovided'],
+                    datasets: [{
+                        data: ageData,
+                        backgroundColor: ['#FF6384', '#36A2EB', '#E5E5E5'],
+                        hoverBackgroundColor: ['#FF6384', '#36A2EB', '#E5E5E5']
+                    }]
+                }
+            };
+
             return res.render('dashboard', {
                 trackName: res.locals.currentTrack.name,
                 trackSlug: res.locals.trackSlug,
@@ -269,27 +387,11 @@ module.exports = function(app) {
                 numPending: results[4],
                 numResubmit: results[5],
                 numCompleted: results[6],
-                gender: {
-                    male: results[7],
-                    female: results[8],
-                    other: results[9],
-                    unprovided: results[10]
-                },
-                education: {
-                    prehs: results[11],
-                    hs: results[12],
-                    someuni: results[13],
-                    associates: results[14],
-                    bachelors: results[15],
-                    masters: results[16],
-                    phd: results[17],
-                    unprovided: results[18]
-                },
-                age: {
-                    gt: results[19],
-                    lte: results[20],
-                    unprovided: results[21]
-                }
+                genderChartOptions: genderChartOptions,
+                educationChartOptions: educationChartOptions,
+                ageChartOptions: ageChartOptions,
+                statsAge: calcStatsByAge(res.locals.currentTrack.questions),
+                statsEdu: calcStatsByEdu(res.locals.currentTrack.questions)
             });
         });
     });
@@ -314,18 +416,105 @@ module.exports = function(app) {
             }
 
             let tasks = [];
+            let q = res.locals.currentTrack.questions[idx];
+
+            tasks.push(countStatus('complete'));
+            tasks.push(countYeses([q]));
+            tasks.push(countSecureMatches(q, 'gender', 'male', checkEq));
+            tasks.push(countSecureMatches(q, 'gender', 'female', checkEq));
+            tasks.push(countSecureMatches(q, 'gender', 'other', checkEq));
+            tasks.push(countSecureMatches(q, 'gender', '', checkEq));
+            tasks.push(countSecureMatches(q, 'education', 'prehs', checkEq));
+            tasks.push(countSecureMatches(q, 'education', 'hs', checkEq));
+            tasks.push(countSecureMatches(q, 'education', 'someuni', checkEq));
+            tasks.push(countSecureMatches(q, 'education', 'associates',
+                checkEq));
+            tasks.push(countSecureMatches(q, 'education', 'bachelors',
+                checkEq));
+            tasks.push(countSecureMatches(q, 'education', 'masters', checkEq));
+            tasks.push(countSecureMatches(q, 'education', 'phd', checkEq));
+            tasks.push(countSecureMatches(q, 'age', 26, checkGt));
+            tasks.push(countSecureMatches(q, 'age', 26, checkLte));
+            tasks.push(countSecureMatches(q, 'age', null, checkEq));
 
             // Organize results and send to dashboard-question view
             async.parallel(tasks, function(err, results) {
                 if (err) return res.render('error');
 
-                let lte26 = results[0], gt26 = results[1];
+                let genderData = [], educationData = [], ageData = [];
+                for (let i = 2; i <= 5; i++) genderData.push(results[i]);
+                for (let i = 6; i <= 12; i++) educationData.push(results[i]);
+                for (let i = 13; i <= 15; i++) ageData.push(results[i]);
+
+                const genderChartOptions = {
+                    type: 'pie',
+                    data: {
+                        labels: ['Male', 'Female', 'Other', 'Unprovided'],
+                        datasets: [{
+                            data: genderData,
+                            backgroundColor: ['#551A8B', '#008000',
+                                '#A52A2A', '#E5E5E5'],
+                            hoverBackgroundColor: ['#551A8B', '#008000',
+                                '#A52A2A', '#E5E5E5']
+                        }]
+                    }
+                };
+
+                const educationChartOptions = {
+                    type: 'bar',
+                    data: {
+                        labels: ['Some High School', 'Graduated High School',
+                            'Some College', 'Associate\'s Degree',
+                            'Bachelor\'s Degree', 'Master\'s Degree', 'Ph.D.'],
+                        datasets: [{
+                            label: '# of Users',
+                            data: educationData,
+                            backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                            borderColor: 'rgba(54, 162, 235, 1)',
+                            borderWidth: 1,
+                            hoverBackgroundColor: 'rgba(255, 99, 132, 0.2)',
+                            hoverBorderColor: 'rgba(255, 99, 132, 1)',
+                            hoverBorderWidth: 1
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            yAxes: [{
+                                ticks: { beginAtZero:true }
+                            }]
+                        }
+                    }
+                };
+
+                const ageChartOptions = {
+                    type: 'pie',
+                    data: {
+                        labels: ['Over 26', '26 and Under', 'Unprovided'],
+                        datasets: [{
+                            data: ageData,
+                            backgroundColor: ['#FF6384', '#36A2EB', '#E5E5E5'],
+                            hoverBackgroundColor: ['#FF6384', '#36A2EB',
+                                '#E5E5E5']
+                        }]
+                    }
+                };
 
                 return res.render('dashboard-question', {
                     trackName: res.locals.currentTrack.name,
                     trackSlug: res.locals.trackSlug,
-                    questionNumber: questionNo,
-                    questionText: res.locals.currentTrack.questions[idx].text
+                    numCompleted: results[0],
+                    yeses: results[1],
+                    question: {
+                        number: questionNo,
+                        text: res.locals.currentTrack.questions[idx].text,
+                        subject: res.locals.currentTrack.questions[idx].subject,
+                        tag: res.locals.currentTrack.questions[idx].tag,
+                        expected: res.locals.currentTrack.questions[idx]
+                            .expected
+                    },
+                    genderChartOptions: genderChartOptions,
+                    educationChartOptions: educationChartOptions,
+                    ageChartOptions: ageChartOptions
                 });
             });
     });

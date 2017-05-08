@@ -2,20 +2,101 @@ extends layout
 
 block styles
   link(rel='stylesheet', href='/assets/css/track.css')
+  link(rel='stylesheet', href='/assets/css/dashboard.css')
+  link(rel='stylesheet', href='/assets/css/tag.css')
 
 block content
   .ui.padded.grid
     .one.wide.column
     .fourteen.wide.column
-      .ui.huge.header.padded.inverted= `${trackName} Track: Dashboard | #${questionNumber}`
+      h1.ui.inverted.header.left.aligned(style='padding: 10px;')
+        i.level.down.icon
+        .content
+          span(style='padding-right: 20px;') #{trackName} Track
+          .sub.header
+            .ui.large.breadcrumb
+              a.section(href='/tracks') Tracks
+              i.right.chevron.icon.divider
+              a.section(href=`/tracks/${trackSlug}/dashboard`) Dashboard
+              i.right.chevron.icon.divider
+              .active.section= `Question ${question.number}`
+      .ui.one.centered.doubling.stackable.cards.questionArea
+        .ui.question.card
+          .content
+            .header
+              h2.ui.header.left.aligned
+                i.file.text.outline.icon
+                .content
+                  | Question #{question.number}
+                  .sub.header= question.subject
+          .content
+            p= question.text
+          .content.tagArea
+            .tagHeader
+              h3 Tags:
+            .tagList
+              ul.tags
+                li: span.tag= question.tag
+            .ui.statistics.tagAdjacent
+              if question.expected === 'yes'
+                .ui.mini.horizontal.green.statistic
+                  .value= yeses
+                  .label Secure
+                .ui.mini.horizontal.red.statistic
+                  .value= numCompleted - yeses
+                  .label Not Secure
+              else
+                .ui.mini.horizontal.green.statistic
+                  .value= numCompleted - yeses
+                  .label Secure
+                .ui.mini.horizontal.red.statistic
+                  .value= yeses
+                  .label Not Secure
       .ui.container.center.aligned
         .ui.horizontal.divider.inverted.header
-          i.file.text.icon
-          | Question Text
-        .ui.question.segment.left.aligned
-          p= questionText
-        .ui.horizontal.divider.inverted.header
-          i.bar.chart.icon
-          | General Statistics
+          i.user.icon
+          | Secure User Breakdown
+        .ui.two.centered.doubling.stackable.cards
+          .card
+            .content
+              .header
+                h2.ui.header.left.aligned(style='padding: 10px;')
+                  i.users.icon
+                  .content
+                    | Gender Breakdown
+                    .sub.header A pie chart of the overall counts for users by gender.
+            .content
+              canvas.gender(height='150')
+          .card
+            .content
+              .header
+                h2.ui.header.left.aligned(style='padding: 10px;')
+                  i.birthday.icon
+                  .content
+                    | Age Breakdown
+                    .sub.header Split on 1991, when the World Wide Web became public.
+            .content
+              canvas.age(height='150')
         .ui.one.centered.doubling.stackable.cards
+          .card
+            .content
+              .header
+                h2.ui.header.left.aligned(style='padding: 10px;')
+                  i.student.icon
+                  .content
+                    | Education Breakdown
+                    .sub.header A bar chart showing the overall counts for users by education.
+            .content
+              canvas.education(height='120')
     .one.wide.column
+
+block scripts
+  script(src='/charts/Chart.min.js')
+  script(type='text/javascript').
+    $(document).ready(function() {
+      Chart.defaults.global.defaultFontFamily = "'Roboto', sans-serif";
+      Chart.defaults.global.defaultFontSize = 14;
+      let genderChart = new Chart($('canvas.gender'), !{JSON.stringify(genderChartOptions).replace(/<\//g, '<\\/')});
+      let educationChart = new Chart($('canvas.education'), !{JSON.stringify(educationChartOptions).replace(/<\//g, '<\\/')});
+      let ageChart = new Chart($('canvas.age'), !{JSON.stringify(ageChartOptions).replace(/<\//g, '<\\/')});
+    });
