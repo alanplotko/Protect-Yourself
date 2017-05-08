@@ -144,6 +144,23 @@ const countSecureMatches = function(question, key, value, cmpFunc) {
         callback(null, count);
     };
 };
+const countClicks = function(question, key) {
+    return function(callback) {
+        let responses = question.responses;
+        let gt26 = [], leq26 = [];
+        for (let i = 0; i < responses.length; i++) {
+            if (responses[i].profile.age > 26) {
+                gt26.push(responses[i][key]);
+            } else {
+                leq26.push(responses[i][key]);
+            }
+        }
+        callback(null, {
+            gt26: jStat.sum(gt26),
+            leq26: jStat.sum(leq26)
+        });
+    };
+};
 
 let calcStatsByAge = function(qs) {
     let secureLte26 = [], secureGt26 = [];
@@ -330,9 +347,9 @@ module.exports = function(app) {
                     labels: ['Male', 'Female', 'Other', 'Unprovided'],
                     datasets: [{
                         data: genderData,
-                        backgroundColor: ['#551A8B', '#008000', '#A52A2A',
+                        backgroundColor: ['#F1E0C5', '#89B0AE', '#A52A2A',
                             '#E5E5E5'],
-                        hoverBackgroundColor: ['#551A8B', '#008000', '#A52A2A',
+                        hoverBackgroundColor: ['#F1E0C5', '#89B0AE', '#A52A2A',
                             '#E5E5E5']
                     }]
                 }
@@ -436,6 +453,8 @@ module.exports = function(app) {
             tasks.push(countSecureMatches(q, 'age', 26, checkGt));
             tasks.push(countSecureMatches(q, 'age', 26, checkLte));
             tasks.push(countSecureMatches(q, 'age', null, checkEq));
+            tasks.push(countClicks(q, 'inQuestionClicks'));
+            tasks.push(countClicks(q, 'inSummaryClicks'));
 
             // Organize results and send to dashboard-question view
             async.parallel(tasks, function(err, results) {
@@ -452,9 +471,9 @@ module.exports = function(app) {
                         labels: ['Male', 'Female', 'Other', 'Unprovided'],
                         datasets: [{
                             data: genderData,
-                            backgroundColor: ['#551A8B', '#008000',
+                            backgroundColor: ['#F1E0C5', '#89B0AE',
                                 '#A52A2A', '#E5E5E5'],
-                            hoverBackgroundColor: ['#551A8B', '#008000',
+                            hoverBackgroundColor: ['#F1E0C5', '#89B0AE',
                                 '#A52A2A', '#E5E5E5']
                         }]
                     }
@@ -514,7 +533,9 @@ module.exports = function(app) {
                     },
                     genderChartOptions: genderChartOptions,
                     educationChartOptions: educationChartOptions,
-                    ageChartOptions: ageChartOptions
+                    ageChartOptions: ageChartOptions,
+                    inQuestionClickStats: results[16],
+                    inSummaryClickStats: results[17]
                 });
             });
     });

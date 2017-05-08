@@ -77,6 +77,38 @@ block content
                     .sub.header Split on 1991, when the World Wide Web became public.
             .content
               canvas.age(height='150')
+          .card
+            .content
+              .header
+                h2.ui.header.left.aligned(style='padding: 10px;')
+                  i.calculator.icon
+                  .content
+                    | In-Test Click Total by Age
+                    .sub.header Number of clicks for users who wanted to learn more prior to answering question ##{question.number}.
+            .content
+              .ui.two.statistics
+                .ui.statistic
+                  .value= inQuestionClickStats.leq26
+                  .label 26 and under
+                .ui.statistic
+                  .value= inQuestionClickStats.gt26
+                  .label Over 26
+          .card
+            .content
+              .header
+                h2.ui.header.left.aligned(style='padding: 10px;')
+                  i.calculator.icon
+                  .content
+                    | Summary Click Total by Age
+                    .sub.header Number of clicks for users who wanted to learn more after completing the self-check test.
+            .content
+              .ui.two.statistics
+                .ui.statistic
+                  .value= inSummaryClickStats.leq26
+                  .label 26 and under
+                .ui.statistic
+                  .value= inSummaryClickStats.gt26
+                  .label Over 26
         .ui.one.centered.doubling.stackable.cards
           .card
             .content
