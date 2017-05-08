@@ -54,29 +54,9 @@ block content
                   .label Not Secure
       .ui.container.center.aligned
         .ui.horizontal.divider.inverted.header
-          i.user.icon
-          | Secure User Breakdown
+          i.mouse.pointer.icon
+          | Click Statistics
         .ui.two.centered.doubling.stackable.cards
-          .card
-            .content
-              .header
-                h2.ui.header.left.aligned(style='padding: 10px;')
-                  i.users.icon
-                  .content
-                    | Gender Breakdown
-                    .sub.header A pie chart of the overall counts for users by gender.
-            .content
-              canvas.gender(height='150')
-          .card
-            .content
-              .header
-                h2.ui.header.left.aligned(style='padding: 10px;')
-                  i.birthday.icon
-                  .content
-                    | Age Breakdown
-                    .sub.header Split on 1991, when the World Wide Web became public.
-            .content
-              canvas.age(height='150')
           .card
             .content
               .header
@@ -109,6 +89,30 @@ block content
                 .ui.statistic
                   .value= inSummaryClickStats.gt26
                   .label Over 26
+        .ui.horizontal.divider.inverted.header
+          i.user.icon
+          | Secure User Breakdown
+        .ui.two.centered.doubling.stackable.cards
+          .card
+            .content
+              .header
+                h2.ui.header.left.aligned(style='padding: 10px;')
+                  i.users.icon
+                  .content
+                    | Gender Breakdown
+                    .sub.header A pie chart showing the overall counts for secure users by gender.
+            .content
+              canvas.gender(height='150')
+          .card
+            .content
+              .header
+                h2.ui.header.left.aligned(style='padding: 10px;')
+                  i.birthday.icon
+                  .content
+                    | Age Breakdown
+                    .sub.header A pie chart showing the overall counts for secure users by age. Split on 1991, when the World Wide Web became public.
+            .content
+              canvas.age(height='150')
         .ui.one.centered.doubling.stackable.cards
           .card
             .content
@@ -116,8 +120,8 @@ block content
                 h2.ui.header.left.aligned(style='padding: 10px;')
                   i.student.icon
                   .content
-                    | Education Breakdown for Secure Users
-                    .sub.header A bar chart showing the overall counts for users that are deemed secure by education.
+                    | Education Breakdown
+                    .sub.header A bar chart showing the overall counts for secure users by education.
             .content
               canvas.education(height='120')
     .one.wide.column
