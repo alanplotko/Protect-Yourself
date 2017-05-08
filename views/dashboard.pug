@@ -1,0 +1,230 @@
+extends layout
+
+block styles
+  link(rel='stylesheet', href='/assets/css/dashboard.css')
+
+block content
+  .ui.padded.grid
+    .one.wide.column
+    .fourteen.wide.column
+      h1.ui.inverted.header.left.aligned(style='padding: 10px;')
+        i.block.layout.icon
+        .content
+          span(style='padding-right: 20px;') #{trackName} Track
+          .sub.header
+            .ui.large.breadcrumb
+              a.section(href='/tracks') Tracks
+              i.right.chevron.icon.divider
+              .active.section Dashboard
+      .ui.container.center.aligned
+        .ui.horizontal.divider.inverted.header
+          i.bar.chart.icon
+          | General Statistics
+        .ui.six.centered.doubling.stackable.cards
+          .card
+            .content
+              .ui.statistic
+                .value= numUsers
+                .label Users
+          .card
+            .content
+              .ui.statistic
+                .value= numProfiles
+                .label Profiles
+          .card
+            .content
+              .ui.statistic
+                .value= numStarted
+                .label Just Started
+          .card
+            .content
+              .ui.green.statistic
+                .value= numCompleted
+                .label Completed
+          .card
+            .content
+              .ui.yellow.statistic
+                .value= numPending
+                .label Almost done
+          .card
+            .content
+              .ui.red.statistic
+                .value= numResubmit
+                .label Need to resubmit
+        .ui.horizontal.divider.inverted.header
+          i.user.icon
+          | User Breakdown
+        .ui.two.centered.doubling.stackable.cards
+          .card
+            .content
+              .header
+                h2.ui.header.left.aligned(style='padding: 10px;')
+                  i.users.icon
+                  .content
+                    | Gender Breakdown
+                    .sub.header A pie chart of the overall counts for users by gender.
+            .content
+              canvas.gender(height='150')
+          .card
+            .content
+              .header
+                h2.ui.header.left.aligned(style='padding: 10px;')
+                  i.birthday.icon
+                  .content
+                    | Age Breakdown
+                    .sub.header Split on 1991, when the World Wide Web became public.
+            .content
+              canvas.age(height='150')
+        .ui.one.centered.doubling.stackable.cards
+          .card
+            .content
+              .header
+                h2.ui.header.left.aligned(style='padding: 10px;')
+                  i.student.icon
+                  .content
+                    | Education Breakdown
+                    .sub.header A bar chart showing the overall counts for users by education.
+            .content
+              canvas.education(height='120')
+
+        .ui.horizontal.divider.inverted.header
+          i.calculator.icon
+          | Hypotheses
+        .ui.one.centered.doubling.stackable.cards
+          .card
+            .content
+              .header
+                h2.ui.header.left.aligned(style='padding: 10px;')
+                  i.birthday.icon
+                  .content
+                    | Age &amp; Security
+                    .sub.header Does age correlate with how secure someone is online?
+            .content.left.aligned
+              p
+                strong We believe that, on average, the older group will perform worse at the self-check test than the younger group.
+              p Let $S$ be the security score, the number of questions that we deem to be secure answers. We formalize this hypothesis as:
+              br
+              p.center.aligned $H_0: S_{\text{age}\leq 26} = S_{\text{age}>26}$
+              p.center.aligned $H_A: S_{\text{age}\leq 26} > S_{\text{age}>26}$
+              br
+              p We tabulated several statistics below for a better understanding of our results.
+              table.ui.definition.table
+                thead
+                  tr
+                    th
+                    th Over 26
+                    th 26 and Under
+                tbody
+                  tr
+                    td Mean Security Score
+                    td= statsAge[0].mean.toFixed(3)
+                    td= statsAge[1].mean.toFixed(3)
+                  tr
+                    td Sample Size
+                    td= statsAge[0].size
+                    td= statsAge[1].size
+                  tr
+                    td Variance
+                    td= statsAge[0].variance.toFixed(3)
+                    td= statsAge[1].variance.toFixed(3)
+              p We're doing a one-tailed difference of means test in order to find whether there is statistical signficance for our claim. We get the following results below:
+              .ui.three.statistics
+                .ui.statistic
+                  .value= statsAge[2].stderr.toFixed(3)
+                  .label Standard Error
+                .ui.statistic
+                  .value= statsAge[2].zscore.toFixed(3)
+                  .label Z-Score
+                .ui.statistic
+                  .value= statsAge[2].pvalue.toExponential(3)
+                  .label P-Value
+              br
+              p We can safely conclude that there is statistical significance at $\alpha = 0.05$. This tells us that we should focus on educating an older audience to have a greater impact in our overall goal to educate users about online security.
+          .card
+            .content
+              .header
+                h2.ui.header.left.aligned(style='padding: 10px;')
+                  i.student.icon
+                  .content
+                    | Education &amp; Security
+                    .sub.header Does education correlate with how secure someone is online?
+            .content.left.aligned
+              p
+                strong We believe that there is a diffference in the average security knowledge along education levels.
+              p Let $S$ be the security score, the number of questions that we deem to be secure answers. We formalize this hypothesis as:
+              br
+              p.center.aligned $H_0: S_{\text{education}< \text{bachelors}} = S_{\text{education}\geq \text{bachelors}}$
+              p.center.aligned $H_A: S_{\text{education}< \text{bachelors}} \ne S_{\text{education}\geq \text{bachelors}}$
+              br
+              p We tabulated several statistics below for a better understanding of our results.
+              table.ui.definition.table
+                thead
+                  tr
+                    th
+                    th Education below Bachelor's Degree
+                    th Education at least Bachelor's Degree
+                tbody
+                  tr
+                    td Mean Security Score
+                    td= statsEdu[0].mean.toFixed(3)
+                    td= statsEdu[1].mean.toFixed(3)
+                  tr
+                    td Sample Size
+                    td= statsEdu[0].size
+                    td= statsEdu[1].size
+                  tr
+                    td Variance
+                    td= statsEdu[0].variance.toFixed(3)
+                    td= statsEdu[1].variance.toFixed(3)
+              p We're doing a two-tailed difference of means test in order to find whether there is statistical signficance for our claim. We get the following results below:
+              .ui.three.statistics
+                .ui.statistic
+                  .value= statsEdu[2].stderr.toFixed(3)
+                  .label Standard Error
+                .ui.statistic
+                  .value= statsEdu[2].zscore.toFixed(3)
+                  .label Z-Score
+                .ui.statistic
+                  .value= statsEdu[2].pvalue.toExponential(3)
+                  .label P-Value
+              br
+              p We can safely conclude that there is statistical significance at $\alpha = 0.05$. Given that the less educated group had a higher mean security score, this seems to imply that higher education levels correlate with lower security score. This seems unintuitive though, and considering the results of the study between different age groups these results are most likely due to the fact that less educated people tend to be younger. If age is truly the causal factor in security score, then a further study of education levels within the same age group should be more revealing.
+        .ui.horizontal.divider.inverted.header
+          i.question.circle.icon
+          | Question Breakdown
+        .ui.four.centered.doubling.stackable.cards
+          for question, index in questions
+            a.card(href=`/tracks/${trackSlug}/dashboard/${index + 1}`)
+              .content
+                h2.ui.header= `Question ${index + 1}`
+                if question.expected === 'yes'
+                  .ui.green.statistic
+                    .value= yeses[index]
+                    .label Secure
+                  .ui.red.statistic
+                    .value= numCompleted - yeses[index]
+                    .label Not Secure
+                else
+                  .ui.green.statistic
+                    .value= numCompleted - yeses[index]
+                    .label Secure
+                  .ui.red.statistic
+                    .value= yeses[index]
+                    .label Not Secure
+    .one.wide.column
+
+block scripts
+  script(src='/charts/Chart.min.js')
+  script(type='text/x-mathjax-config').
+    MathJax.Hub.Config({
+      tex2jax: {inlineMath: [['$','$'], ['\\\(','\\)']]}
+    });
+  script(src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML')
+  script(type='text/javascript').
+    $(document).ready(function() {
+      Chart.defaults.global.defaultFontFamily = "'Roboto', sans-serif";
+      Chart.defaults.global.defaultFontSize = 14;
+      let genderChart = new Chart($('canvas.gender'), !{JSON.stringify(genderChartOptions).replace(/<\//g, '<\\/')});
+      let educationChart = new Chart($('canvas.education'), !{JSON.stringify(educationChartOptions).replace(/<\//g, '<\\/')});
+      let ageChart = new Chart($('canvas.age'), !{JSON.stringify(ageChartOptions).replace(/<\//g, '<\\/')});
+    });

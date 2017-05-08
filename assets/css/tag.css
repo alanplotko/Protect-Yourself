@@ -10,7 +10,8 @@
   height: 26px;
 }
 
-.tags li a {
+.tags li a,
+.tags li span {
   background: #eee;
   font-size: 14px;
   border-radius: 3px 0 0 3px;
@@ -24,6 +25,19 @@
   -webkit-transition: color 0.2s;
   -moz-transition: color 0.2s;
   -o-transition: color 0.2s;
+}
+
+.tags li span {
+  -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+     -khtml-user-select: none; /* Konqueror HTML */
+       -moz-user-select: none; /* Firefox */
+        -ms-user-select: none; /* Internet Explorer/Edge */
+            user-select: none; /* Non-prefixed version */
+}
+
+.tags li span:hover {
+  cursor: default;
 }
 
 .tag::before {
